@@ -1,0 +1,30 @@
+.story-txt {
+    h3 {
+        margin-bottom: 26px;
+    }
+}
+.story-list {
+    margin-bottom: 32px;
+    p {
+        color: var(--color-primary);
+    }
+}
+.story-row {
+    &:nth-child(2n) {
+        flex-direction: row-reverse;
+        .story-txt {
+            padding: 0 36px 0 120px;
+        }
+    }
+}
+.story-img {
+    aspect-ratio: 4 / 2;
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+.story-txt {
+    padding: 0 120px 0 36px;
+}

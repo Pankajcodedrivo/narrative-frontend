@@ -1,0 +1,25 @@
+.header {
+    padding: 15px 0;
+    background: linear-gradient(108.18deg, #FFFFFF 0%, #FFF6EB 100%);
+}
+.header-otr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    .btn {
+        min-width: 200px;
+    }
+    .navbar {
+        ul {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            li {
+                a {
+                    color: var(--color-2f);
+                }
+            }
+        }
+    }
+}

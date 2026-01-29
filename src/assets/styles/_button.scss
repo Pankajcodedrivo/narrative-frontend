@@ -1,0 +1,26 @@
+.btn {
+    border-radius: 100px;
+    padding: 15px 24px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 0.8;
+    font-weight: 400;
+    transition: all 0.5s;
+    gap: 10px;
+    &.btn-outline {
+        background: transparent;
+        border-color: var(--color-a1);
+        color: var(--color-a1);
+    }
+    &.btn-primary {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+    &.btn-secondary {
+        background: var(--color-secondary);
+        color: var(--color-white);
+    }
+}
