@@ -27,7 +27,6 @@ import SubHeader from "../../../components/SubHeader/SubHeader";
 import BenefitCard from "../../../components/Home/BenefitsFeatures/BenefitCard";
 import FeatureCard from "../../../components/Home/Feature/FeatureCard";
 import StoryCard from "../../../components/Home/Story/StoryCard";
-
 import Footer from "../../../components/Footer/Footer";
 import ReviewSection from "../../../components/Home/Review/ReviewSection";
 
@@ -39,7 +38,6 @@ const Home = () => {
     }, []);
   return (
     <>
-      <Header />
       <section className="banner" style={{ backgroundImage: `url(${banner})` }}>
         <div className="container">
           <div className="row align-items-center g-5">
@@ -322,7 +320,6 @@ const Home = () => {
         </div>
       </section>
       <ReviewSection />
-      <Footer />
     </>
   );
 };

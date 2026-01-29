@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/public/Home/Home';
 import Contact from '../pages/public/Contact/Contact';
+import PublicLayout from '../layouts/PublicLayout';
 
 // Auth Pages
 // import Login from '../pages/auth/Login/Login';
@@ -35,11 +36,10 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/contact" element={<Contact />} /> 
-      {/* <Route path="/about" element={<About />} />
-      <Route path="/services" element={<Services />} />*/}
-
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} /> 
+      </Route>
     </Routes>
   );
 };
