@@ -139,3 +139,20 @@ input.form-control:focus {
     height: 100%;
     object-fit: cover;
 }
+.slick-slide {
+    padding: 0 12px;
+}
+.slick-list {
+    margin: 0 -12px;
+}
+.scale {
+    overflow: hidden;
+    &:hover {
+        img {
+            transform: scale(1.05);
+        }
+    }
+    img {
+        transition: all 0.5s;
+    }
+}

@@ -20,7 +20,7 @@ const ReviewCard = ({name,subtitle,desc,image}: Props) => {
                 <p>{subtitle}</p>
             </div>
         </div>
-        <p>{desc}</p>
+        <p className="desc">{desc}</p>
         <span className="posted">Posted on</span>
         <span><img src={googleLogo} alt="" /></span>
     </div>

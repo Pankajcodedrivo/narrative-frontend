@@ -8,9 +8,9 @@ import "./BenefitCard.scss";
 const BenefitCard = ({title,desc,image}: Props) => {
   return (
     <div className="benefit-innr">
-        <div className="benefit-pic">
+        <div className="benefit-pic scale">
             <img src={image} alt="" />
-            <button type="button" className="play-btn"><img src={playBtn} alt="" /></button>
+            <a href="https://youtu.be/zGRPON4FcBk?si=_BuCMvCJ1YEOvcq2"  data-fancybox className="play-btn"><img src={playBtn} alt="" /></a>
             <p>Duration - 2:5 Mins.</p>
         </div>
         <div className="benefit-content">

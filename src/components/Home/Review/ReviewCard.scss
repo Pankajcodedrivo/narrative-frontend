@@ -42,3 +42,39 @@
         }
     }
 }
+.desc {
+    min-height: 70px;
+}
+.review-slider {
+    padding-bottom: 50px;
+    .slick-prev ,.slick-next{
+        bottom: 0;
+        top: auto;
+        transform: none;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+    .slick-prev {
+        left: -40px;
+        background-image: url('../../../assets/images/left-arrow.svg')!important;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        width: 25px;
+        height: 5px;
+        &:before {
+            display: none;
+        }
+    }
+    .slick-next{
+        right: -40px;
+        background-image: url('../../../assets/images/right-arrow.svg')!important;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        width: 25px;
+        height: 5px;
+        &:before {
+            display: none;
+        }
+    }
+}

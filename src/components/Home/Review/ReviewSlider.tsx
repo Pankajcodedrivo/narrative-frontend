@@ -7,7 +7,7 @@ import user4 from "../../../assets/images/user-4.png";
 
 const ReviewSlider = () => {
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
     slidesToShow: 4,
@@ -16,7 +16,7 @@ const ReviewSlider = () => {
   };
 
   return (
-    <Slider {...settings}>
+    <Slider {...settings} className="review-slider">
         <ReviewCard
         image={user1}
         desc="Absolutely amazing service! Their expertise and dedication truly set them apart."

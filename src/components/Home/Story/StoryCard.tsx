@@ -8,7 +8,7 @@ const StoryCard = ({title,image,children}: Props) => {
   return (
     <div className="row align-items-center story-row m-0">
         <div className="col-md-6 story-col p-0">
-            <div className="story-img">
+            <div className="story-img scale">
               <img src={image} alt="" />
             </div>
         </div>
