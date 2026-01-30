@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Fancybox } from "@fancyapps/ui";
 import { useEffect } from "react";
-import Header from "../../../components/Header/Header";
 import banner from "../../../assets/images/banner.jpg";
 import banImg from "../../../assets/images/banner-img.jpg";
 import shape1 from "../../../assets/images/shape-1.png";
@@ -27,8 +26,7 @@ import SubHeader from "../../../components/SubHeader/SubHeader";
 import BenefitCard from "../../../components/Home/BenefitsFeatures/BenefitCard";
 import FeatureCard from "../../../components/Home/Feature/FeatureCard";
 import StoryCard from "../../../components/Home/Story/StoryCard";
-import Footer from "../../../components/Footer/Footer";
-import ReviewSection from "../../../components/Home/Review/ReviewSection";
+import ReviewSection from "../../../components/Review/ReviewSection";
 
 
 const Home = () => {

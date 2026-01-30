@@ -1,5 +1,5 @@
-import googleLogo from "../../../assets/images/google-logo.svg";
-import rating from "../../../assets/images/rating.svg";
+import googleLogo from "../../assets/images/google-logo.svg";
+import rating from "../../assets/images/rating.svg";
 type Props = {
   image: string;
   desc: string;

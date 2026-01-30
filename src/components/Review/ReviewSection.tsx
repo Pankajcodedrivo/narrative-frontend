@@ -1,6 +1,6 @@
-import ReviewSlider from "../../../components/Home/Review/ReviewSlider";
-import google from "../../../assets/images/google.png";
-import SubHeader from "../../../components/SubHeader/SubHeader";
+import ReviewSlider from "../../components/Review/ReviewSlider";
+import google from "../../assets/images/google.png";
+import SubHeader from "../../components/SubHeader/SubHeader";
 import "./ReviewCard.scss";
 const ReviewSection = () => {
   return (
