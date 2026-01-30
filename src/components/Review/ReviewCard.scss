@@ -2,6 +2,10 @@
     background: rgba(225, 216, 204, 0.2);
     padding: 24px;
     border-radius: 16px;
+    @media (max-width:1199px) { 
+        padding: 15px;
+        min-height: 290px;
+    }
     .rating {
         margin-bottom: 16px;
         display: block;
@@ -23,6 +27,9 @@
         align-items: center;
         gap: 16px;
         margin-bottom: 16px;
+        @media (max-width:1199px) { 
+            gap: 9px;
+        }
         .review-pic {
             width: 40px;
             height: 40px;
@@ -34,10 +41,16 @@
             h4 {
                 color: #1A1A1A;
                 margin-bottom: 8px;
+                @media (max-width:1199px) { 
+                    margin-bottom: 4px;
+                }
             }
             p {
                 font-size: 14px;
                 margin-bottom: 0;
+                @media (max-width:1199px) { 
+                    font-size: 13px;
+                }
             }
         }
     }
@@ -57,7 +70,7 @@
     }
     .slick-prev {
         left: -40px;
-        background-image: url('../../../assets/images/left-arrow.svg')!important;
+        background-image: url('../../assets/images/left-arrow.svg')!important;
         background-repeat: no-repeat;
         background-size: 100% 100%;
         width: 25px;
@@ -68,7 +81,7 @@
     }
     .slick-next{
         right: -40px;
-        background-image: url('../../../assets/images/right-arrow.svg')!important;
+        background-image: url('../../assets/images/right-arrow.svg')!important;
         background-repeat: no-repeat;
         background-size: 100% 100%;
         width: 25px;

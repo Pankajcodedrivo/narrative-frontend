@@ -18,7 +18,7 @@ const StoryCard = ({title,image,children}: Props) => {
                 <div className="story-list">
                     {children}
                 </div>
-                <button className="btn btn-primary">Start Your Story</button>
+                <button className="btn btn-primary mw-100">Start Your Story</button>
             </div>
         </div>
     </div>

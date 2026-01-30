@@ -16,6 +16,7 @@ import storyImage1 from "../../../assets/images/story-image-1.jpg";
 import storyImage2 from "../../../assets/images/story-image-2.jpg";
 import circle from "../../../assets/images/circle.png";
 import curve2 from "../../../assets/images/curve-2.png";
+import curveMobile from "../../../assets/images/curve-mobile.png";
 import img1 from "../../../assets/images/img1.jpg";
 import img2 from "../../../assets/images/img2.jpg";
 import leftCurve from "../../../assets/images/left-curve.png";
@@ -43,7 +44,7 @@ const Home = () => {
               <div className="banner-content">
                 <h1>Turn memories into a beautiful life story — <span> Powered by AI.</span></h1>
                 <p>Capture personal stories through an interactive AI - guided interview and transform them into a timeless memorial video.</p>
-                <button className="btn btn-secondary">Start Your Story</button>
+                <button className="btn btn-secondary mw-100">Start Your Story</button>
               </div>
             </div>
             <div className="col-md-6">
@@ -64,7 +65,7 @@ const Home = () => {
           <div className="text-center">
             <SubHeader title="Customer Value Proposition (Benefits & Features)" desc="A clear overview of the benefits and features designed to drive results." />
           </div>
-          <div className="row">
+          <div className="row g-4">
             <div className="col-md-4">
               <BenefitCard
                 image={image1}
@@ -94,7 +95,7 @@ const Home = () => {
           <div className="text-center">
             <SubHeader title="Membership Plans" desc="Simple, flexible plans designed to help you turn life’s moments into beautifully crafted stories." />
           </div>
-          <div className="row">
+          <div className="row g-4">
             <div className="col-md-4">
               <div className="plans-card">
                 <h2>₹499<span>/month</span></h2>
@@ -109,7 +110,7 @@ const Home = () => {
                   <li>Standard video export (HD)</li>
                   <li>Email support</li>
                 </ul>
-                <button type="button" className="btn btn-outline">Start Your Story</button>
+                <button type="button" className="btn btn-outline mw-100">Start Your Story</button>
               </div>
             </div>
             <div className="col-md-4">
@@ -127,7 +128,7 @@ const Home = () => {
                   <li>Multiple video formats</li>
                   <li>Priority support</li>
                 </ul>
-                <button type="button" className="btn btn-primary">Create Premium Story</button>
+                <button type="button" className="btn btn-primary mw-100">Create Premium Story</button>
               </div>
             </div>
             <div className="col-md-4">
@@ -144,7 +145,7 @@ const Home = () => {
                   <li>Dedicated account support</li>
                   <li>Early access to new AI features</li>
                 </ul>
-                <button type="button" className="btn btn-outline">Start Studio Access</button>
+                <button type="button" className="btn btn-outline mw-100">Start Studio Access</button>
               </div>
             </div>
           </div>
@@ -157,6 +158,7 @@ const Home = () => {
           </div>
           <div className="how-it-wrapper">
             <div className="curve-2"><img src={curve2} alt="" /></div>
+            <div className="curve-mobile"><img src={curveMobile} alt="" /></div>
               <div className="row">
                 <div className="col-md-4 how-it-works-otr">
                   <div className="how-it-works-innr">
@@ -169,7 +171,7 @@ const Home = () => {
                         <li>Asks carefully crafted interview questions.</li>
                         <li>Helps with guidance + optional sample answers.</li>
                       </ul>
-                      <button type="button" className="btn btn-outline">Begin Interview</button>
+                      <button type="button" className="btn btn-outline mw-100">Begin Interview</button>
                     </div>
                     <span className="number">1</span>
                   </div>
@@ -184,7 +186,7 @@ const Home = () => {
                         <li>They receive a personalized interview link.</li>
                         <li>Option for guests to create their own profile after finishing.</li>
                       </ul>
-                      <button type="button" className="btn btn-primary">Invite Someone to Participate</button>
+                      <button type="button" className="btn btn-primary mw-100">Invite Someone to Participate</button>
                     </div>
                     <span className="number">2</span>
                   </div>
@@ -200,7 +202,7 @@ const Home = () => {
                         <li>Prioritizes emotional depth, character development & personal insights.</li>
                         <li>Removes incomplete or repetitive answers.</li>
                       </ul>
-                      <button type="button" className="btn btn-outline">Get Started</button>
+                      <button type="button" className="btn btn-outline mw-100">Get Started</button>
                     </div>
                     <span className="number">3</span>
                   </div>
@@ -216,12 +218,12 @@ const Home = () => {
             <SubHeader title="Why this Platform?" desc="We merge advanced AI technology with thoughtful design to ensure your memories are captured authentically and transformed into a polished, heartfelt tribute." />
           </div>
           <div className="row align-items-end g-5">
-              <div className="col-md-4">
+              <div className="col-lg-4">
                   <div className="image-1 scale">
                       <img className="img-cover" src={img1} alt="" />
                   </div>
               </div>
-              <div className="col-md-5 pb-46">
+              <div className="col-lg-5 col-md-6 pb-46">
                   <ul className="mb-32 platform-list">
                       <li>Professional-quality storytelling without editors.</li>
                       <li>AI-guided interview for natural responses.</li>
@@ -230,9 +232,9 @@ const Home = () => {
                       <li>Visually stunning, emotionally rich final output.</li>
                       <li>Fast, automated editing pipeline.</li>
                   </ul>
-                  <button type="button" className="btn btn-primary">Start Your Story</button>
+                  <button type="button" className="btn btn-primary mw-100">Start Your Story</button>
               </div>
-              <div className="col-md-3">
+              <div className="col-lg-3 col-md-6">
                   <div className="image-2 scale">
                       <img className="img-cover" src={img2} alt="" />
                   </div>

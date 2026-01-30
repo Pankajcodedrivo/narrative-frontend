@@ -10,6 +10,15 @@
     font-weight: 400;
     transition: all 0.5s;
     gap: 10px;
+    @media (max-width:991px) { 
+        font-size: 15px;
+        padding: 15px 20px;
+    }
+    &.mw-100 {
+        @media (max-width:420px) { 
+            width: 100%;
+        }
+    }
     &.btn-outline {
         background: transparent;
         border-color: var(--color-a1);

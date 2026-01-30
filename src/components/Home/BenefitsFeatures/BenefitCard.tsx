@@ -16,7 +16,7 @@ const BenefitCard = ({title,desc,image}: Props) => {
         <div className="benefit-content">
             <h3>{title}</h3>
             <p>{desc}</p>
-            <button type="button" className="btn btn-outline">Start Your Story</button>
+            <button type="button" className="btn btn-outline mw-100">Start Your Story</button>
         </div>
     </div>
   );

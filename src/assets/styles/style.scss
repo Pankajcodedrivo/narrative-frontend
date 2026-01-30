@@ -15,6 +15,12 @@ body {
     line-height: 1.4;
     color: var(--color-a1);
     background: var(--color-white);
+    @media (max-width:1199px) { 
+        font-size: 15px;
+    }
+     @media (max-width:575px) { 
+        font-size: 14px;
+    }
 }
 
 * {
@@ -67,15 +73,30 @@ img {
 
 h1 {
     font-size: 40px;
+    @media (max-width:991px) { 
+        font-size: 30px;
+    }
+    @media (max-width:767px) { 
+        font-size: 25px;
+    }
 }
 
 h2 {
     font-size: 32px;
+    @media (max-width:991px) { 
+        font-size: 24px;
+    }
+    @media (max-width:767px) { 
+        font-size: 20px;
+    }
 }
 h3 {
     font-size: 20px;
     font-family: var(--glacial_indifferencebold);
     font-weight: normal;
+    @media (max-width:991px) { 
+        font-size: 16px;
+    }
 }
 
 h4 {
@@ -87,7 +108,18 @@ h4 {
 ul {
     padding: 0;
 }
-
+.g-5, .gy-5 {
+  --bs-gutter-y: 3rem;
+  @media (max-width:767px) { 
+    --bs-gutter-y: 2rem;
+  }
+}
+.g-5, .gx-5 {
+  --bs-gutter-x: 3rem;
+  @media (max-width:767px) { 
+    --bs-gutter-x: 2rem;
+  }
+}
 input.form-control:focus {
     box-shadow: none;
 }
@@ -96,9 +128,16 @@ input.form-control:focus {
     @media (min-width:1400px) {
         max-width: 1440px;
     }
+    @media (min-width:1200px) {
+        max-width: 1300px;
+        padding: 0 15px;
+    }
 }
 .common-gap {
     padding: 60px 0;
+    @media (max-width:767px) { 
+        padding: 40px 0;
+    }
 }
 .cmn-top {
     display: flex;
@@ -106,6 +145,12 @@ input.form-control:focus {
     justify-content: space-between;
     gap: 108px;
     margin-bottom: 32px;
+    @media (max-width:767px) { 
+        gap: 20px;
+        margin-bottom: 25px;
+        flex-direction: column;
+        text-align: center;
+    }
     .btn {
         min-width: 260px;
     }
@@ -114,6 +159,17 @@ input.form-control:focus {
     }
 }
 .cmn-list {
+    @media (max-width:767px) { 
+        width: max-content;
+        margin-left: auto;
+        margin-right: auto;
+        li {
+            text-align: left;
+        }
+    }
+    @media (max-width:420px) { 
+        width: 100%;
+    }
     li {
         margin-bottom: 16px;
         color: var(--color-primary);
@@ -141,9 +197,15 @@ input.form-control:focus {
 }
 .slick-slide {
     padding: 0 12px;
+    @media (max-width:1199px) { 
+        padding: 0 8px;
+    }
 }
 .slick-list {
     margin: 0 -12px;
+    @media (max-width:1199px) { 
+        margin: 0 -8px;
+    }
 }
 .scale {
     overflow: hidden;

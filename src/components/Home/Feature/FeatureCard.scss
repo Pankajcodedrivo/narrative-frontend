@@ -1,4 +1,7 @@
 .feature-card {
+    @media (max-width:767px) { 
+        text-align: center;
+    }
     h3 {
         margin-bottom: 16px;
         font-weight: normal;
