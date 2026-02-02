@@ -1,0 +1,19 @@
+.sub-footer {
+    padding: 32px 0;
+    // position: absolute;
+    // bottom: 0;
+    p {
+        color: var(--color-primary);
+        margin-bottom: 0;
+        span {
+            font-family: var(--glacial_indifferencebold);
+            font-weight: normal;
+        }
+        a {
+            color: var(--color-primary);
+            &:hover {
+                color: var(--color-secondary);
+            }
+        }
+    }
+}

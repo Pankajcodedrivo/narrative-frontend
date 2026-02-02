@@ -1,0 +1,21 @@
+div:where(.swal2-container).swal2-backdrop-show,
+div:where(.swal2-container).swal2-noanimation {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.swal2-popup {
+    background: var(--color-white);
+    border-radius: 48px;
+}
+.modal-wrapper {
+    text-align: center;
+    background: var(--color-white);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 147px 30px;
+    h2 {
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

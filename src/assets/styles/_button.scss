@@ -26,6 +26,7 @@
         &:hover {
             background: var(--color-secondary);
             color: var(--color-white);
+            border-color: var(--color-secondary);
         }
     }
     &.btn-primary {

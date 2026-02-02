@@ -1,0 +1,36 @@
+.auth-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
+.right-panel {
+    padding: 113px 144px 0;
+    height: 100vh;
+    overflow-y: auto;
+    max-width: calc(100% - 708px);
+    flex-basis: calc(100% - 708px);
+    position: relative;
+}
+.right-panel-wrapper {
+    max-width: 816px;
+    width: 100%;
+}
+.cta-btn {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    button {
+        border: 0;
+        padding: 0;
+        background: transparent;
+    }
+}
+.clr-2 {
+    color: var(--color-primary);
+    a {
+        text-decoration: underline;
+        color: var(--color-primary);
+        &:hover {
+            color: var(--color-secondary);
+        }
+    }
+}

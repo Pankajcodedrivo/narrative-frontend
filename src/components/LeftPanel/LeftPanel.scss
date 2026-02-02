@@ -1,0 +1,17 @@
+.left-panel {
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    max-width: 708px;
+    flex-basis: 708px;
+    p {
+        color: var(--color-f7);
+        font-size: 32px;
+        margin-bottom: 0;
+        padding: 32px 100px;
+        line-height: 1.3;
+    }
+}
