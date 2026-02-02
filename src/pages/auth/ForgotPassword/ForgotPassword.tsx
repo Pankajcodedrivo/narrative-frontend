@@ -27,8 +27,8 @@ const ForgotPassword = () => {
                     </div>
                 </form>
             </div>
-            <SubFooter />
         </div>
+        <SubFooter />
     </div>
   );
 };

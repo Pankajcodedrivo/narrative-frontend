@@ -1,17 +1,52 @@
 .left-panel {
     background-repeat: no-repeat;
     background-size: cover;
-    height: 100vh;
+    height: 100%;
     display: flex;
     align-items: flex-end;
     justify-content: center;
     max-width: 708px;
     flex-basis: 708px;
+    @media (max-width:1680px) { 
+        max-width: 550px;
+        flex-basis: 550px;
+    }
+    @media (max-width:1399px) { 
+        max-width: 400px;
+        flex-basis: 400px;
+    }
+    @media (max-width:991px) { 
+        max-width: 250px;
+        flex-basis: 250px;
+    }
+    @media (max-width:767px) { 
+        max-width: 100%;
+        flex-basis: 100%;
+        height: 300px;
+        background-position: center;
+        overflow: hidden;
+        text-align: center;
+    }
+    @media (max-width:480px) { 
+        height: 220px;
+    }
     p {
         color: var(--color-f7);
         font-size: 32px;
         margin-bottom: 0;
         padding: 32px 100px;
         line-height: 1.3;
+        @media (max-width:1680px) { 
+            font-size: 25px;
+            padding: 26px 80px;
+        }
+        @media (max-width:1399px) { 
+            font-size: 22px;
+            padding: 20px 50px;
+        }
+        @media (max-width:991px) { 
+            font-size: 16px;
+            padding: 15px 30px;
+        }
     }
 }

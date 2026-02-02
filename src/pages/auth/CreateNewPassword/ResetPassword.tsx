@@ -4,7 +4,6 @@ import "./ResetPassword.scss";
 import LeftPanel from "../../../components/LeftPanel/LeftPanel";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
-import Modal from "../../../components/Modal/Modal";
 const ResetPassword = () => {
   return (
     <div className="auth-wrapper">
@@ -39,8 +38,8 @@ const ResetPassword = () => {
                     </div>
                 </form>
             </div>
-            <SubFooter />
         </div>
+        <SubFooter />
     </div>
   );
 };

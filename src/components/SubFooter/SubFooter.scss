@@ -1,7 +1,32 @@
 .sub-footer {
-    padding: 32px 0;
-    // position: absolute;
-    // bottom: 0;
+    padding: 32px 144px;
+    position: fixed;
+    bottom: 0;
+    background: var(--color-white);
+    z-index: 5;
+    width: calc(100% - 708px);
+    margin-left: auto;
+    right: 0;
+    @media (max-width:1680px) { 
+        width: calc(100% - 550px);
+    }
+    @media (max-width:1399px) { 
+        width: calc(100% - 400px);
+        padding: 25px 110px;
+    }
+    @media (max-width:1199px) { 
+        padding: 20px 50px;
+    }
+    @media (max-width:991px) { 
+        width: calc(100% - 250px);
+        padding: 20px 30px;
+    }
+    @media (max-width:767px) { 
+        position: static;
+        width: 100%;
+        text-align: center;
+        padding: 20px 20px;
+    }
     p {
         color: var(--color-primary);
         margin-bottom: 0;

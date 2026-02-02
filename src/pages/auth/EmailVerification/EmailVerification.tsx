@@ -28,8 +28,8 @@ const EmailVerification = () => {
                     </div>
                 </form>
             </div>
-            <SubFooter />
         </div>
+        <SubFooter />
     </div>
   );
 };

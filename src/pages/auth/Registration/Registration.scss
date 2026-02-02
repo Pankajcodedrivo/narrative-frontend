@@ -1,27 +1,68 @@
 .auth-wrapper {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    height: 100vh;
 }
 .right-panel {
-    padding: 113px 144px 0;
-    height: 100vh;
+    padding: 113px 144px;
+    height: 100%;
     overflow-y: auto;
     max-width: calc(100% - 708px);
     flex-basis: calc(100% - 708px);
     position: relative;
+    @media (max-width:1680px) { 
+        max-width: calc(100% - 550px);
+        flex-basis: calc(100% - 550px);
+    }
+    @media (max-width:1399px) { 
+        max-width: calc(100% - 400px);
+        flex-basis: calc(100% - 400px);
+        padding: 80px 110px 100px;
+    }
+    @media (max-width:1199px) { 
+        padding: 50px 50px 100px;
+    }
+    @media (max-width:991px) { 
+        max-width: calc(100% - 250px);
+        flex-basis: calc(100% - 250px);
+        padding: 40px 30px 100px;
+    }
+    @media (max-width:767px) { 
+        max-width: 100%;
+        flex-basis: 100%;
+        padding: 40px 20px;
+        height: auto;
+        overflow: visible;
+    }
 }
 .right-panel-wrapper {
     max-width: 816px;
     width: 100%;
+    @media (max-width:767px) { 
+        text-align: center;
+    }
 }
 .cta-btn {
     display: flex;
     gap: 16px;
     margin-bottom: 16px;
+    @media (max-width:767px) { 
+        justify-content: center;
+    }
+    @media (max-width:480px) { 
+        flex-direction: column;
+    }
     button {
         border: 0;
         padding: 0;
         background: transparent;
+        @media (max-width:480px) { 
+            width: 100%;
+            img {
+                width: 100%;
+            }
+        }
     }
 }
 .clr-2 {
@@ -32,5 +73,17 @@
         &:hover {
             color: var(--color-secondary);
         }
+    }
+}
+.auth-logo {
+    @media (max-width:991px) { 
+        max-width: 100px;
+        &.mb-5 {
+            margin-bottom: 2rem!important;
+        }
+    }
+    @media (max-width:767px) { 
+        margin-left: auto;
+        margin-right: auto;
     }
 }

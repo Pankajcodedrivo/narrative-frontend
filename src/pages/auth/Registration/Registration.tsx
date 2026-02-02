@@ -67,10 +67,10 @@ const Registration = () => {
                         <button type="button"><img src={cta2} alt="" /></button>
                     </div>
                     <p className="clr-2">Already have an account? <Link to="/login">Log in</Link></p>
-                    <SubFooter />
                 </form>
             </div>
         </div>
+        <SubFooter />
     </div>
   );
 };

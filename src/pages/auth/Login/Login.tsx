@@ -51,8 +51,8 @@ const Login = () => {
                     <p className="clr-2">Don’t have an account? <Link to="/registration"> Sign Up</Link></p>
                 </form>
             </div>
-            <SubFooter />
         </div>
+        <SubFooter />
     </div>
   );
 };
