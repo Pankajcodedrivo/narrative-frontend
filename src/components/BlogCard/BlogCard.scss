@@ -1,0 +1,42 @@
+.blog-card {
+    display: block;
+    p {
+        color: var(--color-a1);
+    }
+    &:hover {
+        .btn {
+            background: var(--color-secondary);
+            color: var(--color-white);
+            border-color: var(--color-secondary);
+        }
+        .blog-pic {
+            img {
+                transform: scale(1.05);
+                transition: all 0.5s;
+            }
+            &:after {
+                opacity: 1;
+            }
+        }
+    }
+    .blog-pic {
+        margin-bottom: 16px;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 4 / 2.1;
+        position: relative;
+        &:after {
+            position: absolute;
+            content: '';
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 51.92%, #FFFFFF 100%);
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+    }
+}
