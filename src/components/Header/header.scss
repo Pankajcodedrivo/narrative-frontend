@@ -59,16 +59,19 @@
 @media (max-width:767px) { 
     /* Hamburger */
     .hamburger {
-    width: 30px;
+    width: 40px;
     cursor: pointer;
     z-index: 100;
     position: relative;
     display: block;
+    background: var(--color-secondary);
+    border-radius: 4px;
+    padding: 2px 6px;
     }
     .hamburger span {
     display: block;
     height: 2px;
-    background: #000;
+    background: #fff;
     margin: 6px 0;
     transition: 0.3s;
     }

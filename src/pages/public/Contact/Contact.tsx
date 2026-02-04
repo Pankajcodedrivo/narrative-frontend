@@ -7,7 +7,7 @@ const Contact = () => {
           <div className="inner-hdr text-center mb-4">
               <h1 className="mb-0"><span> Stay Connected</span> — Contact Us</h1>
           </div>
-          <figure className="contact-pic"><img src={contactImg} alt="" /></figure>
+          <figure className="img-wrapper"><img src={contactImg} alt="" /></figure>
           <form action="">
               <p className="mb-4">We’d love to hear from you. Reach out with your questions, feedback, or ideas.</p>
               <div className="row">

@@ -2,6 +2,11 @@
     padding: 75px 0;
     position: relative;
     z-index: 1;
+    @media (max-width:767px) { 
+        padding: 40px 0;
+        text-align: center;
+        background-position: center;
+    }
     &:after {
         position: absolute;
         content: '';

@@ -1,5 +1,8 @@
 .blog-card {
     display: block;
+    @media (max-width:767px) { 
+        text-align: center;
+    }
     p {
         color: var(--color-a1);
     }
