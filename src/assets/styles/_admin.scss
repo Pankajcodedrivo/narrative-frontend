@@ -18,3 +18,10 @@
         text-align: center;
     }
 }
+.cmn-box {
+    background: linear-gradient(180deg, rgba(243, 246, 229, 0.12) 0%, rgba(139, 141, 157, 0.12) 100%);
+    border-radius: 10px;
+    &.lg {
+        padding: 48px 119px;
+    }
+}
