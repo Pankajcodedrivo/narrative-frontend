@@ -1,0 +1,20 @@
+
+.admin-layout {
+    display: flex;
+    flex-wrap: wrap;
+}
+.dashboard-right {
+    max-width: calc(100% - 430px);
+    flex-basis: calc(100% - 430px);
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 100px 0 62px;
+    position: relative;
+    .sub-footer {
+        position:static;
+        padding-left: 0;
+        padding-right: 0;
+        width: 100%;
+        text-align: center;
+    }
+}
