@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Fancybox } from "@fancyapps/ui";
 import { useEffect } from "react";
 import banner from "../../../assets/images/banner.jpg";
@@ -28,7 +27,6 @@ import BenefitCard from "../../../components/Home/BenefitsFeatures/BenefitCard";
 import FeatureCard from "../../../components/Home/Feature/FeatureCard";
 import StoryCard from "../../../components/Home/Story/StoryCard";
 import ReviewSection from "../../../components/Review/ReviewSection";
-
 
 const Home = () => {
   useEffect(() => {

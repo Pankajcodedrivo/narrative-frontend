@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.svg";
 import "./header.scss";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     return (
         <header className="header">
@@ -22,7 +24,7 @@ const Header = () => {
                             </ul>
                         </div>
                     </div>
-                    <button type="button" className="btn btn-outline">Login/Register</button>
+                    <button type="button" className="btn btn-outline" onClick={() => navigate("/login")}>Login/Register</button>
                     <div
                         className={`hamburger ${open ? "active" : ""}`}
                         onClick={() => setOpen(!open)}
