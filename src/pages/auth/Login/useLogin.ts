@@ -41,10 +41,10 @@ onSubmit: async (values) => {
     localStorage.setItem("access_token", response?.data?.tokens.access);
     localStorage.setItem("refresh_token", response?.data?.tokens.refresh);
 
-    if (user?.role === "admin") {
-      navigate("/admin/report-library", { replace: true });
+    if (user?.isProfileCompleted) {
+      navigate("/my-profile", { replace: true });
     } else {
-      navigate("/client/report-library", { replace: true });
+      navigate("/welcome", { replace: true });
     }
 
   } catch (error) {

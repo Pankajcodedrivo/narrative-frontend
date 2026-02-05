@@ -12,6 +12,9 @@
     @media (max-width:991px) { 
         font-size: 15px;
     }
+    span {
+        font-family: var(--glacial_indifferenceregular);
+    }
     &.float {
         position: absolute;
         top: -12px;
@@ -22,6 +25,20 @@
         @media (max-width:767px) { 
             left: 20px;
         }
+    }
+}
+textarea {
+    &.form-control {
+        height: 120px;
+        padding-top: 19px;
+    }
+}
+select {
+    &.form-control {
+        background-image: url('../images/down-arrow.svg');
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: right 25px center;
     }
 }
 .form-control {
@@ -39,6 +56,10 @@
     }
     &::placeholder {
         color: var(--color-bb);
+    }
+    &:focus {
+        outline: none;
+        box-shadow: none;
     }
 }
 .password {
