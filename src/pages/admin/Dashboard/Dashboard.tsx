@@ -2,16 +2,11 @@ import videoPic from "../../../assets/images/video-pic.jpg"
 import playBtn from "../../../assets/images/play-btn.svg";
 import tick from "../../../assets/images/tick.png"
 import "./Dashboard.scss";
+import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 const Dashboard = () => {
   return (
     <>
-      <div className="welcome-header">
-            <div>
-                <h2>Welcome, User!</h2>
-                <p className="mb-0">All your recorded and upcoming interviews in one place.</p>  
-            </div>
-            <button type="button" className="btn btn-secondary mw-100">Start Your Story</button>
-      </div>
+      <WelcomeHeader desc="All your recorded and upcoming interviews in one place." />
       <div className="video-innr mb-4">
           <figure className="video-pic mb-0">
             <img className="image-area" src={videoPic} alt="" />
