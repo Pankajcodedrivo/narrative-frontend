@@ -4,7 +4,7 @@ import Footer from '../components/Footer/Footer';
 
 const PublicLayout = () => {
   return (
-    <div className="auth-layout">
+    <div className="main-layout">
       <Header />
       <Outlet />
       <Footer />

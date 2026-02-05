@@ -11,6 +11,14 @@ import ResetPassword from '../pages/auth/CreateNewPassword/ResetPassword';
 import BlogDetails from '../pages/public/BlogDetails/BlogDetails';
 import Blog from '../pages/public/Blog/Blog';
 import Faq from '../pages/public/Faq/Faq';
+import AdminLayout from '../layouts/AdminLayout';
+import Dashboard from '../pages/admin/Dashboard/Dashboard';
+import MyProfile from '../pages/admin/MyProfile/MyProfile';
+import Settings from '../pages/admin/Settings/Settings';
+import NeedAssistance from '../pages/admin/NeedAssistance/NeedAssistance';
+import MyCollections from '../pages/admin/MyCollections/MyCollections';
+import MyCollectionsDetails from '../pages/admin/MyCollectionsDetails/MyCollectionsDetails';
+import MyInterviews from '../pages/admin/MyInterviews/MyInterviews';
 
 const AppRoutes = () => {
   return (
@@ -30,6 +38,16 @@ const AppRoutes = () => {
         <Route path="/blog-details" element={<BlogDetails />} /> 
         <Route path="/blog" element={<Blog />} /> 
         <Route path="/faq" element={<Faq />} /> 
+      </Route>
+      {/* Admin Routes */}
+      <Route element={<AdminLayout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/need-assistance" element={<NeedAssistance />} />
+        <Route path="/my-collections" element={<MyCollections />} />
+        <Route path="/my-collections-details" element={<MyCollectionsDetails />} />
+        <Route path="/my-interviews" element={<MyInterviews />} />
       </Route>
     </Routes>
   );
