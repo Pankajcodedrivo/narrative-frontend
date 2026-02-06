@@ -11,6 +11,7 @@ interface RegistrationFormValues {
     email: string;
     password: string;
     cpassword: string;
+    terms: boolean;
 }
 
 export const useRegistration = () => {
@@ -22,6 +23,7 @@ export const useRegistration = () => {
         email: "",
         password: "",
         cpassword: "",
+        terms: false, 
     },
     validationSchema: yup.object({
         firstName: fnameSchema,
@@ -29,6 +31,9 @@ export const useRegistration = () => {
         email: emailSchema,
         password: passwordSchema,
         cpassword: confirmPasswordSchema,
+        terms: yup
+        .boolean()
+        .oneOf([true], "You must accept Terms & Conditions"),
     }),
     onSubmit: async (values) => {
       const bodyData = {

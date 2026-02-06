@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Input.css";
 
 export type InputTypes =
@@ -24,7 +24,8 @@ export interface InputFieldProps {
   disabled?: boolean;
   errorMsg?: string;
   name?: string;
-  rightIcon?: string; // 👈 image path
+  rightIcon?: string;
+  enablePasswordToggle?: boolean; // Toggle control
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -38,15 +39,29 @@ const InputField: React.FC<InputFieldProps> = ({
   errorMsg,
   name,
   rightIcon,
+  enablePasswordToggle = true, // default enabled
   ...props
 }) => {
+
+  // Password Toggle State
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPasswordField = type === "password" && enablePasswordToggle;
+
+  const finalType = isPasswordField
+    ? showPassword
+      ? "text"
+      : "password"
+    : type;
+
   return (
     <div className="custom-input-wrapper">
       <div className="input-field">
+
         <input
           id={id}
           name={name || id}
-          type={type}
+          type={finalType}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -55,11 +70,24 @@ const InputField: React.FC<InputFieldProps> = ({
           {...props}
         />
 
-        {rightIcon && (
+        {/* Password Toggle Icon */}
+        {isPasswordField && rightIcon && (
+          <span
+            className="input-right-icon"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ cursor: "pointer" }}
+          >
+            <img src={rightIcon} alt="toggle password" />
+          </span>
+        )}
+
+        {/* Normal Right Icon (Non Password Fields) */}
+        {!isPasswordField && rightIcon && (
           <span className="input-right-icon">
             <img src={rightIcon} alt="icon" />
           </span>
         )}
+
       </div>
 
       {errorMsg && <p className="input-error">{errorMsg}</p>}

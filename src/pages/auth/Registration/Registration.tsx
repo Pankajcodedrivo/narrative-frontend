@@ -8,6 +8,7 @@ import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
 import { useRegistration } from "./useRegistration";
 import InputField from "../../../components/common/forms/Input/Input";
+import lock from "../../../assets/images/lock.svg";
 
 const Registration = () => {
     const { registrationFormik } = useRegistration();
@@ -79,6 +80,7 @@ const Registration = () => {
                                         onChange={registrationFormik.handleChange}
                                         value={registrationFormik.values.password}
                                         errorMsg={registrationFormik.errors.password}
+                                        rightIcon={lock}
                                     />
                                 </div>
                             </div>
@@ -95,15 +97,27 @@ const Registration = () => {
                                         onChange={registrationFormik.handleChange}
                                         value={registrationFormik.values.cpassword}
                                         errorMsg={registrationFormik.errors.cpassword}
+                                        rightIcon={lock}
                                         />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <label className="checkbox-container mb-32">I agree to the <Link to="/">Terms & Conditions</Link> and <Link to="/">Privacy Policy</Link>
-                        <input type="checkbox" />
-                        <span className="checkmark"></span>
+                    <label className="checkbox-container mb-32">
+                    I agree to the <Link to="/">Terms & Conditions</Link> and{" "}
+                    <Link to="/">Privacy Policy</Link>
+                    <input
+                        type="checkbox"
+                        name="terms"
+                        onChange={registrationFormik.handleChange}
+                        checked={registrationFormik.values.terms}
+                    />
+                    <span className="checkmark"></span>
                     </label>
+                    {registrationFormik.touched.terms && registrationFormik.errors.terms && (
+                    <p className="input-error">{registrationFormik.errors.terms}</p>
+                    )}
+
                     <div className="form-btn">
                         <button type="submit" className="btn btn-secondary mb-3">Sign Up</button>
                     </div>
