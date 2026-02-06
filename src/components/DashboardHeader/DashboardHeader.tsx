@@ -3,8 +3,18 @@ import notificationIcon from "../../assets/images/notification.svg"
 import user from "../../assets/images/avtar.png"
 import tick from "../../assets/images/tick.png"
 import "./DashboardHeader.scss";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logOut } from "../../../store/auth.store";
 
 const DashboardHeader = () => {
+const dispatch = useDispatch();
+const navigate = useNavigate();
+function logoutHandler() {
+    dispatch(logOut());
+    localStorage.clear();
+    navigate("/login");
+  }
   return (
     <div className="dashboard-header">
         <div className="notification-icon">
@@ -20,7 +30,7 @@ const DashboardHeader = () => {
                     <Link to="/"><span><img src={tick} alt="" /></span> Settings</Link>
                 </li>
                 <li>
-                    <Link to="/"><span><img src={tick} alt="" /></span> Logout</Link>
+                    <Link to="#" onClick={logoutHandler}><span><img src={tick} alt="" /></span> Logout</Link>
                 </li>
             </ul>
         </div>

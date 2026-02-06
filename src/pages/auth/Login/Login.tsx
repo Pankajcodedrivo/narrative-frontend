@@ -7,7 +7,11 @@ import "./Login.scss";
 import LeftPanel from "../../../components/LeftPanel/LeftPanel";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
+import { useLogin } from "./useLogin";
+import InputField from "../../../components/common/forms/Input/Input";
+
 const Login = () => {
+    const { loginFormik } = useLogin();
   return (
     <div className="auth-wrapper">
         <LeftPanel title="Sign in to manage your dashboard and activities." />
@@ -15,20 +19,41 @@ const Login = () => {
             <div className="right-panel-wrapper">
                 <div className="auth-logo mb-5"><img src={logo} alt="" /></div>
                 <SubHeader title="Welcome Back!" desc="Continue creating and preserving your cherished stories." />
-                <form action="">
+                <form
+                    onSubmit={(e) => {
+                    e.preventDefault();
+                    loginFormik.handleSubmit();
+                    }}
+                >
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label className="form-label float">Email Address*</label>
-                                <input type="email" className="form-control" placeholder="Enter email address ..." />
+                                <InputField
+                                    id="email"
+                                    type="email"
+                                    placeholder="Enter email address ..."
+                                    className="form-control"
+                                    onChange={loginFormik.handleChange}
+                                    value={loginFormik.values.email}
+                                    errorMsg={loginFormik.errors.email}
+                                />
                             </div>
                         </div>
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label className="form-label float">Password*</label>
                                 <div className="password">
-                                    <input type="password" className="form-control" placeholder="Enter password ..." />
-                                    <span className="lock"><img src={lock} alt="" /></span>
+                                    <InputField
+                                        id="password"
+                                        type="password"
+                                        placeholder="Enter password ..."
+                                        className="form-control"
+                                        onChange={loginFormik.handleChange}
+                                        value={loginFormik.values.password}
+                                        errorMsg={loginFormik.errors.password}
+                                        rightIcon={lock}
+                                        />
                                 </div>
                             </div>
                         </div>

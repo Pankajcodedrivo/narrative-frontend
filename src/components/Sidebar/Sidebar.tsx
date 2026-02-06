@@ -13,8 +13,18 @@ import iconHover4 from "../../assets/images/icon-hover-4.svg"
 import iconHover5 from "../../assets/images/icon-hover-5.svg"
 import iconHover6 from "../../assets/images/icon-hover-6.svg"
 import "./Sidebar.scss";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logOut } from "../../../store/auth.store";
 
 const Sidebar = () => {
+const dispatch = useDispatch();
+const navigate = useNavigate();
+function logoutHandler() {
+    dispatch(logOut());
+    localStorage.clear();
+    navigate("/login");
+  }
   return (
     <div className="sidebar">
         <div className="sidebar-innr">
@@ -66,10 +76,10 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li>
-                    <Link to="/">
+                    <Link to="#" onClick={logoutHandler}>
                         <span>
-                          <img className="icon" src={icon6} alt="" />
-                          <img className="icon-hover" src={iconHover6} alt="" />
+                        <img className="icon" src={icon6} alt="" />
+                        <img className="icon-hover" src={iconHover6} alt="" />
                         </span>
                         Logout
                     </Link>

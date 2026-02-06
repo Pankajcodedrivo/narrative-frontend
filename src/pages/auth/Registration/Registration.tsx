@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import logo from "../../../assets/images/logo.svg";
-import lock from "../../../assets/images/lock.svg";
 import cta1 from "../../../assets/images/cta1.png";
 import cta2 from "../../../assets/images/cta2.png";
 import "./Registration.scss";
 import LeftPanel from "../../../components/LeftPanel/LeftPanel";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
+import { useRegistration } from "./useRegistration";
+import InputField from "../../../components/common/forms/Input/Input";
+
 const Registration = () => {
+    const { registrationFormik } = useRegistration();
   return (
     <div className="auth-wrapper">
         <LeftPanel title="Welcome! Let’s set up your account in a few steps." />
@@ -15,32 +18,68 @@ const Registration = () => {
             <div className="right-panel-wrapper">
                 <div className="auth-logo mb-5"><img src={logo} alt="" /></div>
                 <SubHeader title="Create Your Account" desc="Start your journey to capturing life stories in a meaningful way." />
-                <form action="">
+                <form
+                    onSubmit={(e) => {
+                    e.preventDefault();
+                    registrationFormik.handleSubmit();
+                    }}
+                >
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
                                 <label className="form-label float">First Name*</label>
-                                <input type="text" className="form-control" placeholder="Enter your name ..." />
+                                <InputField
+                                    id="firstName"
+                                    type="text"
+                                    placeholder="Enter your first name ..."
+                                    className="form-control"
+                                    onChange={registrationFormik.handleChange}
+                                    value={registrationFormik.values.firstName}
+                                    errorMsg={registrationFormik.errors.firstName}
+                                />
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="form-group">
                                 <label className="form-label float">Last Name*</label>
-                                <input type="text" className="form-control" placeholder="Enter your name ..." />
+                                <InputField
+                                    id="lastName"
+                                    type="text"
+                                    placeholder="Enter your last name ..."
+                                    className="form-control"
+                                    onChange={registrationFormik.handleChange}
+                                    value={registrationFormik.values.lastName}
+                                    errorMsg={registrationFormik.errors.lastName}
+                                />
                             </div>
                         </div>
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label className="form-label float">Email Address*</label>
-                                <input type="email" className="form-control" placeholder="Enter email address ..." />
+                                <InputField
+                                    id="email"
+                                    type="email"
+                                    placeholder="Enter email address ..."
+                                    className="form-control"
+                                    onChange={registrationFormik.handleChange}
+                                    value={registrationFormik.values.email}
+                                    errorMsg={registrationFormik.errors.email}
+                                />
                             </div>
                         </div>
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label className="form-label float">Password*</label>
                                 <div className="password">
-                                    <input type="password" className="form-control" placeholder="Enter password ..." />
-                                    <span className="lock"><img src={lock} alt="" /></span>
+                                    <InputField
+                                        id="password"
+                                        type="password"
+                                        placeholder="Enter password ..."
+                                        className="form-control"
+                                        onChange={registrationFormik.handleChange}
+                                        value={registrationFormik.values.password}
+                                        errorMsg={registrationFormik.errors.password}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -48,8 +87,15 @@ const Registration = () => {
                             <div className="form-group">
                                 <label className="form-label float">Confirm Password*</label>
                                 <div className="password">
-                                    <input type="password" className="form-control" placeholder="Enter password ..." />
-                                    <span className="lock"><img src={lock} alt="" /></span>
+                                    <InputField
+                                        id="cpassword"
+                                        type="password"
+                                        placeholder="Enter password ..."
+                                        className="form-control"
+                                        onChange={registrationFormik.handleChange}
+                                        value={registrationFormik.values.cpassword}
+                                        errorMsg={registrationFormik.errors.cpassword}
+                                        />
                                 </div>
                             </div>
                         </div>

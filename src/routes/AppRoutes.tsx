@@ -1,4 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
+
 import Home from '../pages/public/Home/Home';
 import Contact from '../pages/public/Contact/Contact';
 import PublicLayout from '../layouts/PublicLayout';
@@ -11,7 +13,8 @@ import ResetPassword from '../pages/auth/ResetPassword/ResetPassword';
 import BlogDetails from '../pages/public/BlogDetails/BlogDetails';
 import Blog from '../pages/public/Blog/Blog';
 import Faq from '../pages/public/Faq/Faq';
-import AdminLayout from '../layouts/AdminLayout';
+
+import UserLayout from '../layouts/UserLayout';
 import Dashboard from '../pages/admin/Dashboard/Dashboard';
 import MyProfile from '../pages/admin/MyProfile/MyProfile';
 import Settings from '../pages/admin/Settings/Settings';
@@ -23,6 +26,7 @@ import MyInterviews from '../pages/admin/MyInterviews/MyInterviews';
 const AppRoutes = () => {
   return (
     <Routes>
+
       {/* Auth Routes */}
       <Route element={<AuthLayout />}>
         <Route path="/registration" element={<Registration />} /> 
@@ -31,6 +35,7 @@ const AppRoutes = () => {
         <Route path="/verify-otp" element={<EmailVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />  
       </Route>
+
       {/* Public Routes */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
@@ -39,16 +44,20 @@ const AppRoutes = () => {
         <Route path="/blog" element={<Blog />} /> 
         <Route path="/faq" element={<Faq />} /> 
       </Route>
-      {/* Admin Routes */}
-      <Route element={<AdminLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/my-profile" element={<MyProfile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/need-assistance" element={<NeedAssistance />} />
-        <Route path="/my-collections" element={<MyCollections />} />
-        <Route path="/my-collections-details" element={<MyCollectionsDetails />} />
-        <Route path="/my-interviews" element={<MyInterviews />} />
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<UserLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/my-profile" element={<MyProfile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/need-assistance" element={<NeedAssistance />} />
+          <Route path="/my-collections" element={<MyCollections />} />
+          <Route path="/my-collections-details" element={<MyCollectionsDetails />} />
+          <Route path="/my-interviews" element={<MyInterviews />} />
+        </Route>
       </Route>
+
     </Routes>
   );
 };

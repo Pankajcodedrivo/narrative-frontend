@@ -20,9 +20,26 @@ type changePasswordData = {
   password_new: string;
 };
 
+type RegistrationData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  cpassword: string;
+};
+
 export const logInApi = catchAsync(async (values: LoginData) => {
   try {
     const data = await httpsCall.post(`/auth/login`, values);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const registrationApi = catchAsync(async (values: RegistrationData) => {
+  try {
+    const data = await httpsCall.post(`/auth/register`, values);
     return data;
   } catch (error) {
     throw error;

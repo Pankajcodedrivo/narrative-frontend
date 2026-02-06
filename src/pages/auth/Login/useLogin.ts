@@ -30,21 +30,14 @@ onSubmit: async (values) => {
     };
 
     const response = await logInApi(bodyData);
-
     const user = response?.data?.user;
-
-    // 🔴 ADD THIS (REQUIRED for RequireRole)
     localStorage.setItem("user", JSON.stringify(user));
-
     dispatch(setUser(user));
-
     localStorage.setItem("access_token", response?.data?.tokens.access);
     localStorage.setItem("refresh_token", response?.data?.tokens.refresh);
 
-    if (user?.isProfileCompleted) {
-      navigate("/my-profile", { replace: true });
-    } else {
-      navigate("/welcome", { replace: true });
+    if (user?.role == 'user') {
+      navigate("/dashboard", { replace: true });
     }
 
   } catch (error) {

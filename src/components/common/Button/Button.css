@@ -1,0 +1,17 @@
+.MuiButtonBase-root.custom-btn {
+    font-family: var(--ff-montserrat);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    border-radius: 0;
+    padding: 8px 24px;
+    color: var(--color-white) !important;
+    background-color: var(--color-primary) !important;
+}
+
+.MuiButtonBase-root.custom-btn:hover {
+    background-color: #0b3144  !important;
+    color: var(--color-white);
+}

@@ -4,7 +4,11 @@ import "./ForgotPassword.scss";
 import LeftPanel from "../../../components/LeftPanel/LeftPanel";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
+import { useForgotPass } from "./useForgotPass";
+import InputField from "../../../components/common/forms/Input/Input";
+
 const ForgotPassword = () => {
+const { forgotPassFormik } = useForgotPass();
   return (
     <div className="auth-wrapper">
         <LeftPanel title="Don’t worry, we’ll help you reset your password." />
@@ -12,12 +16,20 @@ const ForgotPassword = () => {
             <div className="right-panel-wrapper">
                 <div className="auth-logo mb-5"><img src={logo} alt="" /></div>
                 <SubHeader title="Reset Your Password" desc="Enter the email address associated with your account." />
-                <form action="">
+                <form onSubmit={forgotPassFormik.handleSubmit}>
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group mb-32">
                                 <label className="form-label float">Email Address*</label>
-                                <input type="email" className="form-control" placeholder="Enter email address ..." />
+                                <InputField
+                                    id="email"
+                                    type="email"
+                                    placeholder="Enter email address ..."
+                                    className="form-control"
+                                    onChange={forgotPassFormik.handleChange}
+                                    value={forgotPassFormik.values.email}
+                                    errorMsg={forgotPassFormik.errors.email}
+                                />
                             </div>
                         </div>
                     </div>
