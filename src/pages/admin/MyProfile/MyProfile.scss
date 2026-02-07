@@ -1,0 +1,40 @@
+.my-profile-top {
+    display: flex;
+    gap: 21px;
+    align-items: center;
+    .my-profile-left {
+        position: relative;
+        .edit-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 100%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+        }
+        figure {
+            width: 70px;
+            height: 70px;
+            min-width: 70px;
+            border-radius: 100%;
+            padding: 0.5px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            margin: 0;
+            background: linear-gradient(180deg, rgba(243, 246, 229, 0.12) 0%, rgba(139, 141, 157, 0.12) 100%);
+            overflow: hidden;
+        }
+    }
+    .my-profile-txt {
+        h4 {
+            font-family: var(--glacial_indifferenceregular);
+            margin-bottom: 8px;
+        }
+    }
+}

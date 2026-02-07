@@ -17,7 +17,6 @@ import MyProfile from '../pages/admin/MyProfile/MyProfile';
 import Settings from '../pages/admin/Settings/Settings';
 import NeedAssistance from '../pages/admin/NeedAssistance/NeedAssistance';
 import MyCollections from '../pages/admin/MyCollections/MyCollections';
-import MyCollectionsDetails from '../pages/admin/MyCollectionsDetails/MyCollectionsDetails';
 import MyInterviews from '../pages/admin/MyInterviews/MyInterviews';
 
 const AppRoutes = () => {
@@ -46,7 +45,6 @@ const AppRoutes = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/need-assistance" element={<NeedAssistance />} />
         <Route path="/my-collections" element={<MyCollections />} />
-        <Route path="/my-collections-details" element={<MyCollectionsDetails />} />
         <Route path="/my-interviews" element={<MyInterviews />} />
       </Route>
     </Routes>
