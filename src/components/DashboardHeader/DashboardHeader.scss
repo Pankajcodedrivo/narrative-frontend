@@ -9,6 +9,14 @@
     top: 0;
     z-index: 5;
     background: var(--color-white);
+    @media (max-width:1199px) { 
+        padding: 25px 0;
+        min-height: 100px;
+    }
+    @media (max-width:767px) { 
+        padding: 15px 0;
+        min-height: auto;
+    }
     .notification-icon {
         a {
             width: 48px;
@@ -52,6 +60,18 @@
             border: 1px solid var(--color-e1);
             padding: 18px 16px;
             border-radius: 16px;
+            @media (max-width:767px) { 
+                right: 0;
+                z-index: 555;
+                li {
+                    a {
+                        font-size: 14px;
+                        span {
+                            margin-bottom: 2px;
+                        }
+                    }
+                }
+            }
             li {
                 margin-bottom: 10px;
                 &:last-child {
@@ -70,3 +90,16 @@
         }
     }
 }
+
+.menu-bar {
+    @media (max-width:767px) { 
+        background: var(--color-primary);
+        padding: 2px 6px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: auto;
+        img {
+            width: 27px;
+        }
+    }
+  }

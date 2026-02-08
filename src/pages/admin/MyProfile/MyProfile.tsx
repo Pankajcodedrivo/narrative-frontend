@@ -8,7 +8,7 @@ const MyProfile = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
     <>
-      <WelcomeHeader desc="Manage your personal details, preferences, and storytelling settings in one place." />
+      <WelcomeHeader showButton desc="Manage your personal details, preferences, and storytelling settings in one place." />
       <div className="cmn-box lg">
         <div className="mb-4">
           <h3>My Profile</h3>

@@ -1,12 +1,19 @@
+interface DashboardHeaderProps {
+    toggleMenu: () => void;
+}
 import { Link } from "react-router-dom";
 import notificationIcon from "../../assets/images/notification.svg"
 import user from "../../assets/images/avtar.png"
 import tick from "../../assets/images/tick.png"
+import menu from "../../assets/images/menu.png"
 import "./DashboardHeader.scss";
 
-const DashboardHeader = () => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ toggleMenu }) => {
   return (
     <div className="dashboard-header">
+        <div className="menu-bar d-flex d-md-none" onClick={toggleMenu}>
+            <img src={menu} alt="" />
+        </div>
         <div className="notification-icon">
             <Link to="/"><img src={notificationIcon} alt="" /></Link>
         </div>

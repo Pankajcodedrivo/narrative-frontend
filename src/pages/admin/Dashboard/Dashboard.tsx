@@ -1,12 +1,18 @@
+import { useEffect } from "react";
+import { Fancybox } from "@fancyapps/ui";
 import videoPic from "../../../assets/images/video-pic.jpg"
 import playBtn from "../../../assets/images/play-btn.svg";
 import tick from "../../../assets/images/tick.png"
 import "./Dashboard.scss";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 const Dashboard = () => {
+    useEffect(() => {
+    Fancybox.bind("[data-fancybox]", {});
+      return () => Fancybox.destroy();
+    }, []);
   return (
     <>
-      <WelcomeHeader desc="All your recorded and upcoming interviews in one place." />
+      <WelcomeHeader showButton desc="All your recorded and upcoming interviews in one place." />
       <div className="video-innr mb-4">
           <figure className="video-pic mb-0">
             <img className="image-area" src={videoPic} alt="" />

@@ -10,6 +10,25 @@
     overflow-y: auto;
     padding: 0 100px 0 62px;
     position: relative;
+    @media (max-width:1680px) { 
+        max-width: calc(100% - 320px);
+        flex-basis: calc(100% - 320px);
+    }
+    @media (max-width:1199px) { 
+        max-width: calc(100% - 240px);
+        flex-basis: calc(100% - 240px);
+    }
+    @media (max-width:1399px) { 
+        padding: 0 50px;
+    }
+    @media (max-width:1199px) { 
+        padding: 0 30px;
+    }
+    @media (max-width:767px) { 
+        max-width: 100%;
+        flex-basis: 100%;
+        padding: 0 20px;
+    }
     .sub-footer {
         position:static;
         padding-left: 0;

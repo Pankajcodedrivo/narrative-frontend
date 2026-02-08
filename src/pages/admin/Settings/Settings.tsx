@@ -4,7 +4,7 @@ import "./Settings.scss";
 const Settings = () => {
   return (
     <>
-      <WelcomeHeader desc="Manage your personal details, preferences, and storytelling settings in one place." />
+      <WelcomeHeader showButton desc="Manage your personal details, preferences, and storytelling settings in one place." />
       <div className="cmn-box md">
         <form action="">
           <div className="mb-4">

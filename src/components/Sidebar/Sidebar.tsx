@@ -1,3 +1,7 @@
+interface SidebarProps {
+  isOpen: boolean;
+  closeMenu: () => void;
+}
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo-wh.svg"
 import icon1 from "../../assets/images/icon-1.svg"
@@ -12,12 +16,14 @@ import iconHover3 from "../../assets/images/icon-hover-3.svg"
 import iconHover4 from "../../assets/images/icon-hover-4.svg"
 import iconHover5 from "../../assets/images/icon-hover-5.svg"
 import iconHover6 from "../../assets/images/icon-hover-6.svg"
+import close from "../../assets/images/cross.svg"
 import "./Sidebar.scss";
 
-const Sidebar = () => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-innr">
+            <button className="close-icon" onClick={closeMenu}><img src={close} alt="" /></button>
             <div className="dash-logo"><img src={logo} alt="" /></div>
             <ul className="sidebar-list">
                 <li className="active">
