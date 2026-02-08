@@ -12,13 +12,13 @@ const MyInterviews = () => {
       <WelcomeHeader desc="All your recorded and upcoming interviews in one place." />
       <div className="interviews-box">
         <div className="row m-0">
-          <div className="col-md-6 p-0">
+          <div className="col-lg-6 p-0">
             <div className="interviews-left">
               <figure className="mb-0"><img src={img1} alt="" /></figure>
               <span className="vd-icon cm-icon"><img src={vdicon} alt="" /></span>
             </div>
           </div>
-          <div className="col-md-6 p-0">
+          <div className="col-lg-6 p-0">
             <div className="interviews-right">
               <div className="top-part">
                 <figure className="mb-0"><img src={img2} alt="" /></figure>

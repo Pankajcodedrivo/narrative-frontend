@@ -35,37 +35,37 @@ const MyProfile = () => {
                     </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">First Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Last Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Email Address*</label>
                       <input type="email" className="form-control" placeholder="Enter email address ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Phone Number <span>(Optional)</span></label>
                       <input type="tel" className="form-control" placeholder="Enter phone number ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Date of Birth*</label>
                       <input type="date" className="form-control" placeholder="Select" />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Religion*</label>
                       <select name="" id="" className="form-control">
@@ -101,37 +101,37 @@ const MyProfile = () => {
                     </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">First Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Last Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Email Address*</label>
                       <input type="email" className="form-control" placeholder="Enter email address ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Phone Number <span>(Optional)</span></label>
                       <input type="tel" className="form-control" placeholder="Enter phone number ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Date of Birth*</label>
                       <input type="date" className="form-control" placeholder="Select" />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Religion*</label>
                       <select name="" id="" className="form-control">
@@ -167,37 +167,37 @@ const MyProfile = () => {
                     </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">First Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Last Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Email Address*</label>
                       <input type="email" className="form-control" placeholder="Enter email address ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Phone Number <span>(Optional)</span></label>
                       <input type="tel" className="form-control" placeholder="Enter phone number ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Date of Birth*</label>
                       <input type="date" className="form-control" placeholder="Select" />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Religion*</label>
                       <select name="" id="" className="form-control">
@@ -234,37 +234,37 @@ const MyProfile = () => {
                     </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">First Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Last Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Email Address*</label>
                       <input type="email" className="form-control" placeholder="Enter email address ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Phone Number <span>(Optional)</span></label>
                       <input type="tel" className="form-control" placeholder="Enter phone number ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Date of Birth*</label>
                       <input type="date" className="form-control" placeholder="Select" />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Religion*</label>
                       <select name="" id="" className="form-control">
@@ -300,37 +300,37 @@ const MyProfile = () => {
                     </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">First Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Last Name*</label>
                       <input type="text" className="form-control" placeholder="Enter your name ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Email Address*</label>
                       <input type="email" className="form-control" placeholder="Enter email address ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Phone Number <span>(Optional)</span></label>
                       <input type="tel" className="form-control" placeholder="Enter phone number ..." />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Date of Birth*</label>
                       <input type="date" className="form-control" placeholder="Select" />
                     </div>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label float">Religion*</label>
                       <select name="" id="" className="form-control">

@@ -297,6 +297,7 @@ input:checked ~ .checkmark:after {
   display: inline-block;
   width: 51px;
   height: 31px;
+  min-width: 51px;
 }
 
 .switch input {

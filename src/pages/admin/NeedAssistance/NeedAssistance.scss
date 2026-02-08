@@ -5,13 +5,31 @@
   rgb(243, 246, 229, 0.15) 0%,
   rgb(203, 216, 216, 0.15) 100%
 );
+ @media (max-width:991px) { 
+    padding: 30px;
+ }
+  @media (max-width:575px) { 
+    padding: 20px 15px;
+ }
 }
 .ask-ai {
     margin-bottom: 56px;
+    @media (max-width:991px) { 
+        margin-bottom: 40px;
+    }
+    @media (max-width:575px) { 
+        margin-bottom: 24px;
+    }
     p {
         font-size: 24px;
         color: var(--color-primary);
         margin-bottom: 0;
+        @media (max-width:991px) { 
+            font-size: 20px;
+        }
+        @media (max-width:767px) { 
+            font-size: 16px;
+        }
     }
 }
 .send-msg {
@@ -62,6 +80,9 @@
         display: flex;
         align-items: flex-end;
         gap: 16px;
+        @media (max-width:575px) { 
+            gap: 8px;
+        }
         .chat-right-img {
             width: 48px;
             min-width: 48px;
@@ -93,6 +114,9 @@
         p {
             border-top-left-radius: 4px;
             padding: 24px;
+            @media (max-width:575px) { 
+                padding: 16px 20px;
+            }
         }
     }
     p {
@@ -106,6 +130,9 @@
 .chat-wrapper {
     margin-bottom: 32px;
     min-height: 400px;
+    @media (max-width:575px) { 
+        margin-bottom: 24px;
+    }
 }
 .faq-box {
     display: flex;
@@ -116,4 +143,10 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     background: rgba(225, 216, 204, 0.14);
+    @media (max-width:767px) { 
+        padding: 24px;
+    }
+    @media (max-width:575px) { 
+        padding: 15px;
+    }
 }

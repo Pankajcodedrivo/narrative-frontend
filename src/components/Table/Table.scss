@@ -1,4 +1,7 @@
 .table-wrapper {
+    @media (max-width:1399px) { 
+        overflow-x: auto;
+    }
     .table {
         width: 100%;
         tr {
@@ -13,6 +16,9 @@
               font-family: var(--glacial_indifferencebold);
               font-weight: normal;
               padding-bottom: 8px;
+              @media (max-width:1399px) { 
+                min-width: 210px;
+              }
               &:last-child,&:nth-last-child(2) {
                 text-align: center;
               }

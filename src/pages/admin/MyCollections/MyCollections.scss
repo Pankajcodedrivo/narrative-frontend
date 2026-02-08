@@ -5,10 +5,19 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 32px;
+        @media (max-width:991px) { 
+            flex-direction: column;
+            margin-bottom: 24px;
+            text-align: center;
+        }
         .left-part {
             ul {
                 display: flex;
                 gap: 16px;
+                flex-wrap: wrap;
+                @media (max-width:575px) { 
+                    justify-content: center;
+                }
                 li {
                     span {
                         font-family: var(--glacial_indifferencebold);
@@ -58,12 +67,21 @@
     gap: 16px;
 }
 .accordion.p-32 {
+    .accordion-item {
+        background: rgba(225, 216, 204, 0.14);
+    }
     .accordion-header {
         padding: 32px;
+        @media (max-width:991px) { 
+            padding: 20px;
+        }
     }
     .accordion-body {
         padding-top: 24px;
         padding-bottom: 24px;
-        background: rgb(225, 216, 204, 0.14);
+        @media (max-width:991px) { 
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
     }
 }
