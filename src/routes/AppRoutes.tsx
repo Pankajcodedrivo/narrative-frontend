@@ -18,6 +18,7 @@ import Settings from '../pages/admin/Settings/Settings';
 import NeedAssistance from '../pages/admin/NeedAssistance/NeedAssistance';
 import MyCollections from '../pages/admin/MyCollections/MyCollections';
 import MyInterviews from '../pages/admin/MyInterviews/MyInterviews';
+import NotificationList from '../pages/admin/NotificationList/NotificationList';
 
 const AppRoutes = () => {
   return (
@@ -46,6 +47,7 @@ const AppRoutes = () => {
         <Route path="/need-assistance" element={<NeedAssistance />} />
         <Route path="/my-collections" element={<MyCollections />} />
         <Route path="/my-interviews" element={<MyInterviews />} />
+        <Route path="/notification-list" element={<NotificationList />} />
       </Route>
     </Routes>
   );
