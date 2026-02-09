@@ -5,6 +5,62 @@
     padding: 32px 50px 32px 100px;
     height: 100vh;
     overflow-y: auto;
+    .close-icon {
+        display: none;
+    }
+    @media (max-width:1680px) { 
+        max-width: 320px;
+        flex-basis: 320px;
+        padding:32px 40px 32px 60px;
+    }
+    @media (max-width:1199px) { 
+        max-width: 240px;
+        flex-basis: 240px;
+        padding:25px 20px;
+    }
+    @media (max-width:767px) { 
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        max-width: 100%;
+        flex-basis: 100%;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding: 0;
+        padding-top: 60px;
+        z-index: 1000;
+        border-radius: 0;
+        &.open {
+            width: 300px;
+        }
+        .close-icon {
+            padding: 0;
+            border: 0;
+            background: rgba(255, 255, 255, 0.2);
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+
+            img {
+            filter: brightness(100);
+            }
+        }
+        .sidebar-innr {
+            padding: 0 40px;
+        }
+    }
+    &.open {
+        @media (max-width:575px) { 
+            width: 100%;
+        }
+    }
     .dash-logo {
         margin-bottom: 30px;
     }
@@ -31,6 +87,9 @@
                 padding: 18px 24px;
                 border-radius: 16px;
                 transition: all 0.5s;
+                @media (max-width:1199px) { 
+                    padding: 15px 18px;
+                }
                 .icon-hover {
                     display: none;
                 }

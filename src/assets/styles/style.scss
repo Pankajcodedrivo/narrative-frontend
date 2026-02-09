@@ -40,7 +40,15 @@ input:-webkit-autofill:active {
     scrollbar-width: thin;
     scrollbar-color: var(--color-primary) #fff;
 }
-
+.mb-5 {
+  margin-bottom: 3rem !important;
+  @media (max-width:991px) { 
+    margin-bottom: 2rem !important;
+  }
+  @media (max-width:767px) { 
+    margin-bottom: 1.5rem !important;
+  }
+}
 h1,
 h2,
 h3,

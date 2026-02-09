@@ -70,7 +70,7 @@ export const resetPasswordApi = catchAsync(
 export const changePasswordApi = catchAsync(
   async (values: changePasswordData) => {
     const data = await httpsCall.patch(
-      `/auth/profile/change-password`,
+      `/profile/change-password`,
       values
     );
     return data;

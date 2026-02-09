@@ -3,6 +3,7 @@ import "./ResetPassword.scss";
 import LeftPanel from "../../../components/LeftPanel/LeftPanel";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import SubFooter from "../../../components/SubFooter/SubFooter";
+import lock from "../../../assets/images/lock.svg";
 import { useResetPass } from "./useResetPass";
 import InputField from "../../../components/common/forms/Input/Input";
 
@@ -36,6 +37,7 @@ const ResetPassword = () => {
                                         onChange={resetPasswordFormik.handleChange}
                                         value={resetPasswordFormik.values.password}
                                         errorMsg={resetPasswordFormik.errors.password}
+                                        rightIcon={lock}
                                     />
                                 </div>
                             </div>
@@ -52,6 +54,7 @@ const ResetPassword = () => {
                                         onChange={resetPasswordFormik.handleChange}
                                         value={resetPasswordFormik.values.cpassword}
                                         errorMsg={resetPasswordFormik.errors.cpassword}
+                                        rightIcon={lock}
                                         />
                                 </div>
                             </div>

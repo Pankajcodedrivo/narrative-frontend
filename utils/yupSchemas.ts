@@ -33,13 +33,13 @@ export const confirmPasswordSchema = yup
   .string()
   .trim()
   .required(VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED)
-  .when("password", {
-    is: (password: string) => !!password,
+  .when("password_new", {
+    is: (password_new: string) => !!password_new,
     then: (schema) =>
       schema
         .min(8, VALIDATION_MESSAGES.PASSWORD_MIN)
         .matches(/\w/, VALIDATION_MESSAGES.PASSWORD_INVALID)
-        .oneOf([yup.ref("password")], VALIDATION_MESSAGES.PASSWORD_MATCH),
+        .oneOf([yup.ref("password_new")], VALIDATION_MESSAGES.PASSWORD_MATCH),
   });
 
 // My account validation
