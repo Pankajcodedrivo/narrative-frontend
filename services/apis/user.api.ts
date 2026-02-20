@@ -55,12 +55,12 @@ export const addAmount = catchAsync(async (selectedUserId, values: any) => {
 
 // update account 
 export const updateProfile = catchAsync(async (values) => {
-  const data = await httpsCall.patch(`/lead/profile/update`, values);
+  const data = await httpsCall.patch(`/profile/update`, values);
   return data;
 });
 
 // delete account 
 export const deleteAccount = catchAsync(async () => {
-  const data = await httpsCall.delete(`/lead/profile/delete`);
+  const data = await httpsCall.delete(`/profile/delete`);
   return data;
 });
