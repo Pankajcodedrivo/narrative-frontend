@@ -14,7 +14,7 @@ const AccordionItem = ({ title,
   onToggle, }:AccordionItemProps) => {
   return (
     <div className="accordion-item">
-      <button 
+      <button  type="button"
         className="accordion-header"
         onClick={onToggle}
       >

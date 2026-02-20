@@ -53,6 +53,12 @@ export const addAmount = catchAsync(async (selectedUserId, values: any) => {
 
 // OWN PROFILE
 
+// get account 
+export const getProfile = catchAsync(async () => {
+  const data = await httpsCall.get(`/profile/`);
+  return data;
+});
+
 // update account 
 export const updateProfile = catchAsync(async (values) => {
   const data = await httpsCall.patch(`/profile/update`, values);

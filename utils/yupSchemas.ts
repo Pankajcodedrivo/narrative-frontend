@@ -50,3 +50,228 @@ export const fnameSchema = yup
 export const lnameSchema = yup
   .string()
   .required(VALIDATION_MESSAGES.LAST_NAME);
+
+export const genderSchema = yup
+  .string()
+  .required(VALIDATION_MESSAGES.GENDER_REQUIRED);
+
+export const ageGroupSchema = yup
+  .string()
+  .required(VALIDATION_MESSAGES.AGE_GROUP_REQUIRED);
+
+export const ethnicitySchema = yup
+  .string()
+  .nullable();
+
+export const cityStateSchema = yup
+  .string()
+  .trim()
+  .required(VALIDATION_MESSAGES.CITY_REQUIRED);
+
+/* ================= NESTED SCHEMAS (MATCH MONGODB) ================= */
+
+// Sibling schema
+export const siblingSchema = yup.object({
+  type: yup
+    .string()
+    .required(VALIDATION_MESSAGES.SIBLING_TYPE_REQUIRED),
+  order: yup
+    .string()
+    .required(VALIDATION_MESSAGES.SIBLING_ORDER_REQUIRED),
+});
+
+// Life stage schema (used for childhood and adulthood stages)
+export const lifeStageSchema = yup.object({
+  cityState: yup
+    .string()
+    .trim()
+    .required(VALIDATION_MESSAGES.CITY_REQUIRED),
+  areaType: yup
+    .string()
+    .nullable(),
+  neighborhoodClass: yup
+    .string()
+    .nullable(),
+  livingSpace: yup
+    .string()
+    .nullable(),
+  livingSpaceOther: yup
+    .string()
+    .when('livingSpace', {
+      is: (val: string) => val === 'Other',
+      then: (schema) => schema.required(VALIDATION_MESSAGES.LIVING_SPACE_OTHER_REQUIRED),
+      otherwise: (schema) => schema.nullable(),
+    }),
+  maritalStatus: yup
+    .string()
+    .nullable(),
+});
+
+// Conditional life stage schema (for when "Same as" is selected)
+export const conditionalLifeStageSchema = (isRequired: boolean) => {
+  if (isRequired) {
+    return yup.object({
+      cityState: yup
+        .string()
+        .trim()
+        .required(VALIDATION_MESSAGES.CITY_REQUIRED),
+      areaType: yup.string().nullable(),
+      neighborhoodClass: yup.string().nullable(),
+      livingSpace: yup.string().nullable(),
+      livingSpaceOther: yup.string().when('livingSpace', {
+        is: (val: string) => val === 'Other',
+        then: (schema) => schema.required(VALIDATION_MESSAGES.LIVING_SPACE_OTHER_REQUIRED),
+        otherwise: (schema) => schema.nullable(),
+      }),
+      maritalStatus: yup.string().nullable(),
+    });
+  }
+  
+  return yup.object({
+    cityState: yup.string().nullable(),
+    areaType: yup.string().nullable(),
+    neighborhoodClass: yup.string().nullable(),
+    livingSpace: yup.string().nullable(),
+    livingSpaceOther: yup.string().nullable(),
+    maritalStatus: yup.string().nullable(),
+  });
+};
+
+// Story highlight schema
+export const storyHighlightSchema = yup.object({
+  momentType: yup
+    .string()
+    .when('$shareStory', {
+      is: (shareStory: string) => shareStory === 'Yes',
+      then: (schema) => schema.required(VALIDATION_MESSAGES.MOMENT_REQUIRED),
+      otherwise: (schema) => schema.nullable(),
+    }),
+  momentOther: yup
+    .string()
+    .when(['$shareStory', 'momentType'], {
+      is: (shareStory: string, momentType: string) => 
+        shareStory === 'Yes' && momentType === 'Other',
+      then: (schema) => schema.required(VALIDATION_MESSAGES.MOMENT_OTHER_REQUIRED),
+      otherwise: (schema) => schema.nullable(),
+    }),
+  impactType: yup
+    .string()
+    .when('$shareStory', {
+      is: (shareStory: string) => shareStory === 'Yes',
+      then: (schema) => schema.required(VALIDATION_MESSAGES.IMPACT_REQUIRED),
+      otherwise: (schema) => schema.nullable(),
+    }),
+  impactOther: yup
+    .string()
+    .when(['$shareStory', 'impactType'], {
+      is: (shareStory: string, impactType: string) => 
+        shareStory === 'Yes' && impactType === 'Other',
+      then: (schema) => schema.required(VALIDATION_MESSAGES.IMPACT_OTHER_REQUIRED),
+      otherwise: (schema) => schema.nullable(),
+    }),
+});
+
+/* ================= COMPLETE PROFILE SCHEMA ================= */
+
+// Main profile schema that combines all nested schemas
+export const profileSchema = yup.object({
+  // Basic Information
+  firstName: fnameSchema,
+  lastName: lnameSchema,
+  email: emailSchema,
+  gender: genderSchema,
+  ageGroup: ageGroupSchema,
+  ethnicity: ethnicitySchema,
+  paternalEthnicity: ethnicitySchema,
+  maternalEthnicity: ethnicitySchema,
+  
+  // Siblings
+  siblingsCount: yup
+    .number()
+    .min(0)
+    .max(5)
+    .nullable(),
+  siblings: yup
+    .array()
+    .of(siblingSchema)
+    .when('siblingsCount', {
+      is: (count: number) => count > 0,
+      then: (schema) => schema.min(1),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  // Childhood
+  sameAsEarly: yup.boolean().nullable(),
+  earlyChildhood: lifeStageSchema,
+  lateChildhood: yup
+    .mixed()
+    .when('sameAsEarly', {
+      is: false,
+      then: () => lifeStageSchema,
+      otherwise: () => yup.object().nullable(),
+    }),
+
+  // Adulthood
+  sameAsEarlyAdulthood: yup.boolean().nullable(),
+  earlyAdulthood: lifeStageSchema.shape({
+    maritalStatus: yup.string().nullable(),
+  }),
+  lateAdulthood: yup
+    .mixed()
+    .when('sameAsEarlyAdulthood', {
+      is: false,
+      then: () => lifeStageSchema.shape({
+        maritalStatus: yup.string().nullable(),
+      }),
+      otherwise: () => yup.object().nullable(),
+    }),
+
+  // Story Highlight
+  shareStory: yup
+    .string()
+    .required(VALIDATION_MESSAGES.SHARE_STORY_REQUIRED),
+  storyHighlight: storyHighlightSchema,
+
+   // Profile Image
+  profileimageurl: yup.mixed().nullable(),
+
+  // Reference Images
+  earlyChildhoodImage: yup.mixed().nullable(),
+  lateChildhoodImage: yup.mixed().nullable(),
+  earlyAdulthoodImage: yup.mixed().nullable(),
+  lateAdulthoodImage: yup.mixed().nullable(),
+});
+
+// Type inference from schema
+export type ProfileFormData = yup.InferType<typeof profileSchema>;
+
+/* ================= HELPER FUNCTIONS ================= */
+
+// Function to validate a single field
+export const validateField = async (
+  schema: yup.AnySchema,
+  value: any,
+  context?: object
+) => {
+  try {
+    await schema.validate(value, { context });
+    return { isValid: true, error: null };
+  } catch (error) {
+    if (error instanceof yup.ValidationError) {
+      return { isValid: false, error: error.message };
+    }
+    return { isValid: false, error: 'Validation failed' };
+  }
+};
+
+// Function to create conditional validation based on form state
+export const createConditionalValidator = (
+  condition: (values: any) => boolean,
+  schema: yup.AnySchema
+) => {
+  return yup.mixed().when('$values', {
+    is: (values: any) => condition(values),
+    then: () => schema,
+    otherwise: () => yup.mixed().nullable(),
+  });
+};
