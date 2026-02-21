@@ -1,3 +1,4 @@
+// utils/yupSchemas.ts
 import * as yup from "yup";
 import { VALIDATION_MESSAGES } from "./validationMessages";
 
@@ -63,10 +64,15 @@ export const ethnicitySchema = yup
   .string()
   .nullable();
 
-export const cityStateSchema = yup
+export const citySchema = yup
   .string()
   .trim()
   .required(VALIDATION_MESSAGES.CITY_REQUIRED);
+
+export const stateSchema = yup
+  .string()
+  .trim()
+  .required(VALIDATION_MESSAGES.STATE_REQUIRED);
 
 /* ================= NESTED SCHEMAS (MATCH MONGODB) ================= */
 
@@ -82,10 +88,14 @@ export const siblingSchema = yup.object({
 
 // Life stage schema (used for childhood and adulthood stages)
 export const lifeStageSchema = yup.object({
-  cityState: yup
+  city: yup
     .string()
     .trim()
     .required(VALIDATION_MESSAGES.CITY_REQUIRED),
+  state: yup
+    .string()
+    .trim()
+    .required(VALIDATION_MESSAGES.STATE_REQUIRED),
   areaType: yup
     .string()
     .nullable(),
@@ -111,10 +121,14 @@ export const lifeStageSchema = yup.object({
 export const conditionalLifeStageSchema = (isRequired: boolean) => {
   if (isRequired) {
     return yup.object({
-      cityState: yup
+      city: yup
         .string()
         .trim()
         .required(VALIDATION_MESSAGES.CITY_REQUIRED),
+      state: yup
+        .string()
+        .trim()
+        .required(VALIDATION_MESSAGES.STATE_REQUIRED),
       areaType: yup.string().nullable(),
       neighborhoodClass: yup.string().nullable(),
       livingSpace: yup.string().nullable(),
@@ -128,7 +142,8 @@ export const conditionalLifeStageSchema = (isRequired: boolean) => {
   }
   
   return yup.object({
-    cityState: yup.string().nullable(),
+    city: yup.string().nullable(),
+    state: yup.string().nullable(),
     areaType: yup.string().nullable(),
     neighborhoodClass: yup.string().nullable(),
     livingSpace: yup.string().nullable(),
@@ -173,7 +188,7 @@ export const storyHighlightSchema = yup.object({
 
 /* ================= COMPLETE PROFILE SCHEMA ================= */
 
-// Main profile schema that combines all nested schemas
+// Main profile schema that combines all nested schemas - ADDED Other fields
 export const profileSchema = yup.object({
   // Basic Information
   firstName: fnameSchema,
@@ -182,8 +197,14 @@ export const profileSchema = yup.object({
   gender: genderSchema,
   ageGroup: ageGroupSchema,
   ethnicity: ethnicitySchema,
+  ethnicityOther: yup.string().nullable(), // ADDED
   paternalEthnicity: ethnicitySchema,
+  paternalEthnicityOther: yup.string().nullable(), // ADDED
   maternalEthnicity: ethnicitySchema,
+  maternalEthnicityOther: yup.string().nullable(), // ADDED
+  
+  // Music Genres
+  musicGenres: yup.array().of(yup.string()).nullable(),
   
   // Siblings
   siblingsCount: yup
@@ -232,7 +253,7 @@ export const profileSchema = yup.object({
     .required(VALIDATION_MESSAGES.SHARE_STORY_REQUIRED),
   storyHighlight: storyHighlightSchema,
 
-   // Profile Image
+  // Profile Image
   profileimageurl: yup.mixed().nullable(),
 
   // Reference Images

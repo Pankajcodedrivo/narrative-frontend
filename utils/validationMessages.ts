@@ -13,7 +13,7 @@ export const VALIDATION_MESSAGES = {
   FIRST_NAME: "First name is required",
   LAST_NAME: "Last name is required",
 
-   // Profile - Basic Info
+  // Profile - Basic Info
   FIRST_NAME_REQUIRED: "First name is required",
   LAST_NAME_REQUIRED: "Last name is required",
   GENDER_REQUIRED: "Gender is required",
@@ -25,7 +25,8 @@ export const VALIDATION_MESSAGES = {
   SIBLING_ORDER_REQUIRED: "Please select sibling order",
 
   // Location & Living
-  CITY_REQUIRED: "City / State is required",
+  CITY_REQUIRED: "City is required",
+  STATE_REQUIRED: "State is required",
   AREA_TYPE_REQUIRED: "Geographic area is required",
   NEIGHBORHOOD_CLASS_REQUIRED: "Neighborhood class is required",
   LIVING_SPACE_REQUIRED: "Living space is required",
@@ -42,4 +43,4 @@ export const VALIDATION_MESSAGES = {
   // Common
   FIELD_REQUIRED: "This field is required",
   INVALID_SELECTION: "Please select a valid option",
-}
+};

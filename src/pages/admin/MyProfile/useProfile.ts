@@ -12,7 +12,8 @@ export type Sibling = {
 };
 
 export type ChildhoodStage = {
-  cityState: string;
+  city: string;
+  state: string;
   areaType: string;
   neighborhoodClass: string;
   livingSpace: string;
@@ -40,8 +41,8 @@ export type ReferenceImages = {
 // Section field mappings for validation
 export const SECTION_FIELDS = {
   0: ['firstName', 'lastName', 'email', 'gender', 'ageGroup'],
-  1: ['earlyChildhood.cityState'],
-  2: ['earlyAdulthood.cityState'],
+  1: ['earlyChildhood.city', 'earlyChildhood.state'],
+  2: ['earlyAdulthood.city', 'earlyAdulthood.state'],
   3: ['shareStory'],
   4: [],
 };
@@ -55,10 +56,14 @@ const initialValues: ProfileFormData = {
   gender: '',
   ageGroup: '',
   ethnicity: '',
+  ethnicityOther: '',
   paternalEthnicity: '',
+  paternalEthnicityOther: '',
   maternalEthnicity: '',
+  maternalEthnicityOther: '',
   siblingsCount: 0,
   siblings: [],
+  musicGenres: [],
   
   // Profile Image
   profileimageurl: null,
@@ -66,14 +71,16 @@ const initialValues: ProfileFormData = {
   // Childhood
   sameAsEarly: null,
   earlyChildhood: {
-    cityState: '',
+    city: '',
+    state: '',
     areaType: '',
     neighborhoodClass: '',
     livingSpace: '',
     livingSpaceOther: '',
   },
   lateChildhood: {
-    cityState: '',
+    city: '',
+    state: '',
     areaType: '',
     neighborhoodClass: '',
     livingSpace: '',
@@ -83,7 +90,8 @@ const initialValues: ProfileFormData = {
   // Adulthood
   sameAsEarlyAdulthood: null,
   earlyAdulthood: {
-    cityState: '',
+    city: '',
+    state: '',
     areaType: '',
     neighborhoodClass: '',
     livingSpace: '',
@@ -91,7 +99,8 @@ const initialValues: ProfileFormData = {
     maritalStatus: '',
   },
   lateAdulthood: {
-    cityState: '',
+    city: '',
+    state: '',
     areaType: '',
     neighborhoodClass: '',
     livingSpace: '',
@@ -108,7 +117,7 @@ const initialValues: ProfileFormData = {
     impactOther: '',
   },
   
-  // Reference Images - Use null instead of empty string
+  // Reference Images
   earlyChildhoodImage: null,
   lateChildhoodImage: null,
   earlyAdulthoodImage: null,
@@ -137,6 +146,7 @@ interface UseProfileReturn {
   handleRemoveImage: (field: string) => void;
   handleProfileImageChange: (file: File | null) => void;
   handleRemoveProfileImage: () => void;
+  handleMusicGenreChange: (genre: string, checked: boolean) => void;
   getFieldError: (fieldName: keyof ProfileFormData, sectionIndex: number, validationTriggered: { [key: number]: boolean }) => string | undefined;
   getNestedFieldError: (
     parent: keyof typeof getNestedValues,
@@ -161,6 +171,7 @@ interface UseProfileReturn {
   loadUserProfile: () => Promise<void>;
   profileImageUrl: string | null;
   referenceImages: ReferenceImages;
+  musicGenres: string[];
 }
 
 export const useProfile = (): UseProfileReturn => {
@@ -169,6 +180,7 @@ export const useProfile = (): UseProfileReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [referenceImages, setReferenceImages] = useState<ReferenceImages>({});
+  const [musicGenres, setMusicGenres] = useState<string[]>([]);
   
   const formik = useFormik<ProfileFormData>({
     initialValues,
@@ -201,6 +213,11 @@ export const useProfile = (): UseProfileReturn => {
           }
         });
 
+        // FIXED: Handle musicGenres separately - send as plain array, not stringified
+        // Filter out empty strings
+        const filteredMusicGenres = musicGenres.filter(genre => genre.trim() !== '');
+        formData.append('musicGenres', JSON.stringify(filteredMusicGenres));
+
         // Append all other data as JSON
         const dataToSend = {
           firstName: values.firstName,
@@ -209,8 +226,11 @@ export const useProfile = (): UseProfileReturn => {
           gender: values.gender,
           ageGroup: values.ageGroup,
           ethnicity: values.ethnicity,
+          ethnicityOther: values.ethnicityOther,
           paternalEthnicity: values.paternalEthnicity,
+          paternalEthnicityOther: values.paternalEthnicityOther,
           maternalEthnicity: values.maternalEthnicity,
+          maternalEthnicityOther: values.maternalEthnicityOther,
           siblingsCount: values.siblingsCount,
           siblings: values.siblings,
           sameAsEarly: values.sameAsEarly,
@@ -223,7 +243,7 @@ export const useProfile = (): UseProfileReturn => {
           storyHighlight: values.storyHighlight,
         };
 
-        // Append JSON data
+        // Append JSON data - but NOT musicGenres since we already appended it
         Object.entries(dataToSend).forEach(([key, value]) => {
           if (value !== null && value !== undefined) {
             if (typeof value === 'object') {
@@ -237,7 +257,6 @@ export const useProfile = (): UseProfileReturn => {
         const response = await updateProfile(formData);
         
         if (response.success) {
-          // Success - reload profile data
           if (response.data?.user) {
             await loadUserProfile();
           }
@@ -269,6 +288,23 @@ export const useProfile = (): UseProfileReturn => {
           setReferenceImages(userData.referenceImages);
         }
         
+        // FIXED: Handle musicGenres - ensure it's an array
+        if (userData.musicGenres) {
+          // If it's a string, parse it
+          if (typeof userData.musicGenres === 'string') {
+            try {
+              const parsed = JSON.parse(userData.musicGenres);
+              setMusicGenres(Array.isArray(parsed) ? parsed : []);
+            } catch {
+              setMusicGenres([]);
+            }
+          } else if (Array.isArray(userData.musicGenres)) {
+            setMusicGenres(userData.musicGenres);
+          } else {
+            setMusicGenres([]);
+          }
+        }
+        
         // Map API response to form values
         const formValues: Partial<ProfileFormData> = {
           firstName: userData.firstName || '',
@@ -277,18 +313,56 @@ export const useProfile = (): UseProfileReturn => {
           gender: userData.gender || '',
           ageGroup: userData.ageGroup || '',
           ethnicity: userData.ethnicity || '',
+          ethnicityOther: userData.ethnicityOther || '',
           paternalEthnicity: userData.paternalEthnicity || '',
+          paternalEthnicityOther: userData.paternalEthnicityOther || '',
           maternalEthnicity: userData.maternalEthnicity || '',
+          maternalEthnicityOther: userData.maternalEthnicityOther || '',
           siblingsCount: userData.siblingsCount || 0,
           siblings: userData.siblings || [],
           sameAsEarly: userData.sameAsEarly ?? null,
-          earlyChildhood: userData.earlyChildhood || initialValues.earlyChildhood,
-          lateChildhood: userData.lateChildhood || initialValues.lateChildhood,
+          earlyChildhood: {
+            city: userData.earlyChildhood?.city || '',
+            state: userData.earlyChildhood?.state || '',
+            areaType: userData.earlyChildhood?.areaType || '',
+            neighborhoodClass: userData.earlyChildhood?.neighborhoodClass || '',
+            livingSpace: userData.earlyChildhood?.livingSpace || '',
+            livingSpaceOther: userData.earlyChildhood?.livingSpaceOther || '',
+          },
+          lateChildhood: {
+            city: userData.lateChildhood?.city || '',
+            state: userData.lateChildhood?.state || '',
+            areaType: userData.lateChildhood?.areaType || '',
+            neighborhoodClass: userData.lateChildhood?.neighborhoodClass || '',
+            livingSpace: userData.lateChildhood?.livingSpace || '',
+            livingSpaceOther: userData.lateChildhood?.livingSpaceOther || '',
+          },
           sameAsEarlyAdulthood: userData.sameAsEarlyAdulthood ?? null,
-          earlyAdulthood: userData.earlyAdulthood || initialValues.earlyAdulthood,
-          lateAdulthood: userData.lateAdulthood || initialValues.lateAdulthood,
+          earlyAdulthood: {
+            city: userData.earlyAdulthood?.city || '',
+            state: userData.earlyAdulthood?.state || '',
+            areaType: userData.earlyAdulthood?.areaType || '',
+            neighborhoodClass: userData.earlyAdulthood?.neighborhoodClass || '',
+            livingSpace: userData.earlyAdulthood?.livingSpace || '',
+            livingSpaceOther: userData.earlyAdulthood?.livingSpaceOther || '',
+            maritalStatus: userData.earlyAdulthood?.maritalStatus || '',
+          },
+          lateAdulthood: {
+            city: userData.lateAdulthood?.city || '',
+            state: userData.lateAdulthood?.state || '',
+            areaType: userData.lateAdulthood?.areaType || '',
+            neighborhoodClass: userData.lateAdulthood?.neighborhoodClass || '',
+            livingSpace: userData.lateAdulthood?.livingSpace || '',
+            livingSpaceOther: userData.lateAdulthood?.livingSpaceOther || '',
+            maritalStatus: userData.lateAdulthood?.maritalStatus || '',
+          },
           shareStory: userData.shareStory || '',
-          storyHighlight: userData.storyHighlight || initialValues.storyHighlight,
+          storyHighlight: {
+            momentType: userData.storyHighlight?.momentType || '',
+            momentOther: userData.storyHighlight?.momentOther || '',
+            impactType: userData.storyHighlight?.impactType || '',
+            impactOther: userData.storyHighlight?.impactOther || '',
+          },
           profileimageurl: userData.profileimageurl || null,
         };
 
@@ -371,7 +445,8 @@ export const useProfile = (): UseProfileReturn => {
       });
     } else if (value === false) {
       formik.setFieldValue('lateChildhood', {
-        cityState: '',
+        city: '',
+        state: '',
         areaType: '',
         neighborhoodClass: '',
         livingSpace: '',
@@ -390,7 +465,8 @@ export const useProfile = (): UseProfileReturn => {
       });
     } else if (value === false) {
       formik.setFieldValue('lateAdulthood', {
-        cityState: '',
+        city: '',
+        state: '',
         areaType: '',
         neighborhoodClass: '',
         livingSpace: '',
@@ -427,7 +503,6 @@ export const useProfile = (): UseProfileReturn => {
 
   const handleProfileImageChange = (file: File | null) => {
     if (file) {
-      // Create a temporary URL for preview
       const tempUrl = URL.createObjectURL(file);
       setProfileImageUrl(tempUrl);
       formik.setFieldValue('profileimageurl', file);
@@ -437,6 +512,19 @@ export const useProfile = (): UseProfileReturn => {
   const handleRemoveProfileImage = () => {
     setProfileImageUrl(null);
     formik.setFieldValue('profileimageurl', null);
+  };
+
+  const handleMusicGenreChange = (genre: string, checked: boolean) => {
+    let updatedGenres: string[];
+    if (checked) {
+      updatedGenres = [...musicGenres, genre];
+    } else {
+      updatedGenres = musicGenres.filter(g => g !== genre);
+    }
+    // Filter out empty strings
+    updatedGenres = updatedGenres.filter(g => g.trim() !== '');
+    setMusicGenres(updatedGenres);
+    formik.setFieldValue('musicGenres', updatedGenres);
   };
 
   const getFieldError = (
@@ -479,6 +567,7 @@ export const useProfile = (): UseProfileReturn => {
     handleRemoveImage,
     handleProfileImageChange,
     handleRemoveProfileImage,
+    handleMusicGenreChange,
     getFieldError,
     getNestedFieldError,
     isSubmitting,
@@ -498,5 +587,6 @@ export const useProfile = (): UseProfileReturn => {
     loadUserProfile,
     profileImageUrl,
     referenceImages,
+    musicGenres,
   };
 };
