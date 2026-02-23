@@ -44,6 +44,9 @@ const MyProfile = () => {
   const lateAdulthood = getNestedValues.lateAdulthood(values) as any;
   const storyHighlight = getNestedValues.storyHighlight(values) as any;
 
+  // Safe access to siblingsCount with default value
+  const siblingsCount = values.siblingsCount ?? 0;
+
   // Refs for accordion sections
   const sectionRefs = {
     0: useRef<HTMLDivElement>(null),
@@ -405,65 +408,130 @@ const MyProfile = () => {
                     </div>
                   )}
 
-                  {/* Siblings */}
+                  {/* ===== UPDATED SIBLINGS SECTION WITH NULL/UNDEFINED HANDLING ===== */}
+                  {/* Siblings - Numeric Input Stepper */}
                   <div className="col-lg-6">
                     <div className="form-group">
                       <label className="form-label">I grew up with...siblings</label>
-                      <select
-                        className="form-control"
-                        value={values.siblingsCount || 0}
-                        onChange={handleSiblingsChange}
-                        onBlur={handleBlur}
-                      >
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                      </select>
+                      <div className="numeric-stepper">
+                        <button 
+                          type="button" 
+                          className="stepper-btn"
+                          onClick={() => handleSiblingsChange((siblingsCount) - 1)}
+                          disabled={siblingsCount === 0}
+                        >
+                          -
+                        </button>
+                        <span className="stepper-value">{siblingsCount}</span>
+                        <button 
+                          type="button" 
+                          className="stepper-btn"
+                          onClick={() => handleSiblingsChange((siblingsCount) + 1)}
+                          disabled={siblingsCount >= 5}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {values.siblings?.map((sibling, index) => (
-                    <React.Fragment key={index}>
-                      <div className="col-lg-6">
-                        <div className="form-group">
-                          <label className="form-label">Sibling {index + 1} Type</label>
-                          <select
-                            className="form-control"
-                            value={sibling.type || ''}
-                            onChange={(e) =>
-                              handleSiblingDetailChange(index, "type", e.target.value)
-                            }
-                            onBlur={handleBlur}
-                          >
-                            <option value="">Select</option>
-                            <option value="Brother">Brother</option>
-                            <option value="Sister">Sister</option>
-                          </select>
-                        </div>
-                      </div>
+                  {/* Collapsible Sibling Details - Only show when siblingsCount > 0 */}
+                  {siblingsCount > 0 && (
+                    <div className="col-12 mt-3">
+                      <div className="siblings-container">
+                        <h6 className="mb-3">Sibling Details</h6>
+                        
+                        {values.siblings?.map((sibling, index) => (
+                          <div key={index} className="sibling-card mb-3">
+                            <div className="sibling-card-header">
+                              <h6>Sibling {index + 1}</h6>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-link collapse-btn"
+                                onClick={() => {
+                                  const collapseId = `sibling-${index}`;
+                                  document.getElementById(collapseId)?.classList.toggle('show');
+                                }}
+                              >
+                                Toggle
+                              </button>
+                            </div>
+                            <div id={`sibling-${index}`} className="sibling-card-body show">
+                              <div className="row">
+                                {/* Order - Radio Buttons (Older | Younger) */}
+                                <div className="col-lg-6">
+                                  <div className="form-group">
+                                    <label className="form-label">Sibling {index + 1} is:</label>
+                                    <div className="radio-group">
+                                      <label className="radio-label">
+                                        <input
+                                          type="radio"
+                                          name={`sibling-${index}-order`}
+                                          value="Older"
+                                          checked={sibling.order === 'Older'}
+                                          onChange={() => handleSiblingDetailChange(index, "order", "Older")}
+                                        />
+                                        <span>Older</span>
+                                      </label>
+                                      <label className="radio-label">
+                                        <input
+                                          type="radio"
+                                          name={`sibling-${index}-order`}
+                                          value="Younger"
+                                          checked={sibling.order === 'Younger'}
+                                          onChange={() => handleSiblingDetailChange(index, "order", "Younger")}
+                                        />
+                                        <span>Younger</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
 
-                      <div className="col-lg-6">
-                        <div className="form-group">
-                          <label className="form-label">Sibling {index + 1} Order</label>
-                          <select
-                            className="form-control"
-                            value={sibling.order || ''}
-                            onChange={(e) =>
-                              handleSiblingDetailChange(index, "order", e.target.value)
-                            }
-                            onBlur={handleBlur}
-                          >
-                            <option value="">Select</option>
-                            <option value="Older">Older</option>
-                            <option value="Younger">Younger</option>
-                          </select>
-                        </div>
+                                {/* Gender - Radio Buttons (Male | Female | Other) */}
+                                <div className="col-lg-6">
+                                  <div className="form-group">
+                                    <label className="form-label">Sibling {index + 1} is:</label>
+                                    <div className="radio-group">
+                                      <label className="radio-label">
+                                        <input
+                                          type="radio"
+                                          name={`sibling-${index}-gender`}
+                                          value="Male"
+                                          checked={sibling.gender === 'Male'}
+                                          onChange={() => handleSiblingDetailChange(index, "gender", "Male")}
+                                        />
+                                        <span>Male</span>
+                                      </label>
+                                      <label className="radio-label">
+                                        <input
+                                          type="radio"
+                                          name={`sibling-${index}-gender`}
+                                          value="Female"
+                                          checked={sibling.gender === 'Female'}
+                                          onChange={() => handleSiblingDetailChange(index, "gender", "Female")}
+                                        />
+                                        <span>Female</span>
+                                      </label>
+                                      <label className="radio-label">
+                                        <input
+                                          type="radio"
+                                          name={`sibling-${index}-gender`}
+                                          value="Other"
+                                          checked={sibling.gender === 'Other'}
+                                          onChange={() => handleSiblingDetailChange(index, "gender", "Other")}
+                                        />
+                                        <span>Other</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </React.Fragment>
-                  ))}
+                    </div>
+                  )}
 
                   {/* Music Genres */}
                   <div className="col-12 mt-3">

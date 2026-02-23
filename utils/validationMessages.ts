@@ -20,8 +20,8 @@ export const VALIDATION_MESSAGES = {
   AGE_GROUP_REQUIRED: "Age group is required",
   ETHNICITY_REQUIRED: "Ethnicity is required",
 
-  // Siblings
-  SIBLING_TYPE_REQUIRED: "Please select sibling type",
+  // Siblings - UPDATED
+  SIBLING_GENDER_REQUIRED: "Please select sibling gender",
   SIBLING_ORDER_REQUIRED: "Please select sibling order",
 
   // Location & Living

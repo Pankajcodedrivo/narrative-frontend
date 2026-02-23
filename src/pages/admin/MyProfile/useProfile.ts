@@ -5,10 +5,10 @@ import { profileSchema } from '../../../../utils/yupSchemas';
 import type { ProfileFormData } from '../../../../utils/yupSchemas';
 import { getProfile, updateProfile } from '../../../../services/apis/user.api';
 
-// Types
+// Types - UPDATED: Changed from 'type' to 'gender'
 export type Sibling = {
-  type: string;
-  order: string;
+  gender: string;  // "Male", "Female", "Other"
+  order: string;   // "Older", "Younger"
 };
 
 export type ChildhoodStage = {
@@ -137,7 +137,7 @@ interface UseProfileReturn {
   formik: ReturnType<typeof useFormik<ProfileFormData>>;
   storyLocked: boolean;
   setStoryLocked: (locked: boolean) => void;
-  handleSiblingsChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleSiblingsChange: (count: number) => void; // UPDATED: Now accepts number
   handleSiblingDetailChange: (index: number, field: keyof Sibling, value: string) => void;
   handleSameAsEarlyChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleSameAsEarlyAdulthoodChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -213,8 +213,7 @@ export const useProfile = (): UseProfileReturn => {
           }
         });
 
-        // FIXED: Handle musicGenres separately - send as plain array, not stringified
-        // Filter out empty strings
+        // Handle musicGenres separately - send as plain array
         const filteredMusicGenres = musicGenres.filter(genre => genre.trim() !== '');
         formData.append('musicGenres', JSON.stringify(filteredMusicGenres));
 
@@ -243,7 +242,7 @@ export const useProfile = (): UseProfileReturn => {
           storyHighlight: values.storyHighlight,
         };
 
-        // Append JSON data - but NOT musicGenres since we already appended it
+        // Append JSON data
         Object.entries(dataToSend).forEach(([key, value]) => {
           if (value !== null && value !== undefined) {
             if (typeof value === 'object') {
@@ -288,9 +287,8 @@ export const useProfile = (): UseProfileReturn => {
           setReferenceImages(userData.referenceImages);
         }
         
-        // FIXED: Handle musicGenres - ensure it's an array
+        // Handle musicGenres
         if (userData.musicGenres) {
-          // If it's a string, parse it
           if (typeof userData.musicGenres === 'string') {
             try {
               const parsed = JSON.parse(userData.musicGenres);
@@ -305,7 +303,7 @@ export const useProfile = (): UseProfileReturn => {
           }
         }
         
-        // Map API response to form values
+        // Map API response to form values - UPDATED: siblings mapping with gender
         const formValues: Partial<ProfileFormData> = {
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
@@ -319,7 +317,7 @@ export const useProfile = (): UseProfileReturn => {
           maternalEthnicity: userData.maternalEthnicity || '',
           maternalEthnicityOther: userData.maternalEthnicityOther || '',
           siblingsCount: userData.siblingsCount || 0,
-          siblings: userData.siblings || [],
+          siblings: userData.siblings || [], // Now expects { gender, order }
           sameAsEarly: userData.sameAsEarly ?? null,
           earlyChildhood: {
             city: userData.earlyChildhood?.city || '',
@@ -412,20 +410,35 @@ export const useProfile = (): UseProfileReturn => {
     return !hasSectionErrors;
   };
 
-  const handleSiblingsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const count = parseInt(e.target.value) || 0;
-    formik.setFieldValue('siblingsCount', count);
+  // UPDATED: Handle siblings change with numeric stepper
+  const handleSiblingsChange = (count: number) => {
+    const validCount = Math.min(5, Math.max(0, count));
+    formik.setFieldValue('siblingsCount', validCount);
     
-    const newSiblings: Sibling[] = Array.from({ length: count }, () => ({
-      type: '',
-      order: '',
-    }));
+    const currentSiblings = formik.values.siblings || [];
+    let newSiblings;
+    
+    if (validCount > currentSiblings.length) {
+      // Add new empty siblings
+      newSiblings = [
+        ...currentSiblings,
+        ...Array.from({ length: validCount - currentSiblings.length }, () => ({
+          gender: '',
+          order: '',
+        }))
+      ];
+    } else {
+      // Remove extra siblings
+      newSiblings = currentSiblings.slice(0, validCount);
+    }
+    
     formik.setFieldValue('siblings', newSiblings);
   };
 
+  // UPDATED: Handle sibling detail change with gender field
   const handleSiblingDetailChange = (
     index: number,
-    field: keyof Sibling,
+    field: keyof Sibling, // 'gender' | 'order'
     value: string
   ) => {
     const siblings = [...(formik.values.siblings || [])];
@@ -521,7 +534,6 @@ export const useProfile = (): UseProfileReturn => {
     } else {
       updatedGenres = musicGenres.filter(g => g !== genre);
     }
-    // Filter out empty strings
     updatedGenres = updatedGenres.filter(g => g.trim() !== '');
     setMusicGenres(updatedGenres);
     formik.setFieldValue('musicGenres', updatedGenres);

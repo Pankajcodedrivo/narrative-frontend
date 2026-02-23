@@ -76,11 +76,11 @@ export const stateSchema = yup
 
 /* ================= NESTED SCHEMAS (MATCH MONGODB) ================= */
 
-// Sibling schema
+// UPDATED: Sibling schema with gender instead of type
 export const siblingSchema = yup.object({
-  type: yup
+  gender: yup
     .string()
-    .required(VALIDATION_MESSAGES.SIBLING_TYPE_REQUIRED),
+    .required(VALIDATION_MESSAGES.SIBLING_GENDER_REQUIRED),
   order: yup
     .string()
     .required(VALIDATION_MESSAGES.SIBLING_ORDER_REQUIRED),
@@ -188,7 +188,7 @@ export const storyHighlightSchema = yup.object({
 
 /* ================= COMPLETE PROFILE SCHEMA ================= */
 
-// Main profile schema that combines all nested schemas - ADDED Other fields
+// Main profile schema that combines all nested schemas
 export const profileSchema = yup.object({
   // Basic Information
   firstName: fnameSchema,
@@ -197,16 +197,16 @@ export const profileSchema = yup.object({
   gender: genderSchema,
   ageGroup: ageGroupSchema,
   ethnicity: ethnicitySchema,
-  ethnicityOther: yup.string().nullable(), // ADDED
+  ethnicityOther: yup.string().nullable(),
   paternalEthnicity: ethnicitySchema,
-  paternalEthnicityOther: yup.string().nullable(), // ADDED
+  paternalEthnicityOther: yup.string().nullable(),
   maternalEthnicity: ethnicitySchema,
-  maternalEthnicityOther: yup.string().nullable(), // ADDED
+  maternalEthnicityOther: yup.string().nullable(),
   
   // Music Genres
   musicGenres: yup.array().of(yup.string()).nullable(),
   
-  // Siblings
+  // Siblings - UPDATED: Using updated siblingSchema with gender
   siblingsCount: yup
     .number()
     .min(0)
