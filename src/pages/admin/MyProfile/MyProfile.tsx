@@ -4,6 +4,8 @@ import AccordionItem from "../../../components/AccordionItem/AccordionItem";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 import profileImg from "../../../assets/images/profile-lg.png";
 import edit from "../../../assets/images/edit.svg";
+import acc1 from "../../../assets/images/acc-open.svg";
+import acc2 from "../../../assets/images/acc-close.svg";
 import { useProfile, SECTION_FIELDS } from "./useProfile";
 import "./MyProfile.scss";
 
@@ -410,9 +412,9 @@ const MyProfile = () => {
 
                   {/* ===== UPDATED SIBLINGS SECTION WITH NULL/UNDEFINED HANDLING ===== */}
                   {/* Siblings - Numeric Input Stepper */}
-                  <div className="col-lg-6">
-                    <div className="form-group">
-                      <label className="form-label">I grew up with...siblings</label>
+                  <div className="col-lg-12">
+                    <div className="form-group numeric-stepper-wrapper d-sm-flex align-items-center">
+                      <label className="form-label mb-0 me-4">I grew up with...siblings</label>
                       <div className="numeric-stepper">
                         <button 
                           type="button" 
@@ -439,22 +441,22 @@ const MyProfile = () => {
                   {siblingsCount > 0 && (
                     <div className="col-12 mt-3">
                       <div className="siblings-container">
-                        <h6 className="mb-3">Sibling Details</h6>
+                        <h3 className="mb-3">Sibling Details</h3>
                         
                         {values.siblings?.map((sibling, index) => (
                           <div key={index} className="sibling-card mb-3">
                             <div className="sibling-card-header">
                               <h6>Sibling {index + 1}</h6>
-                              <button
+                              {/* <button
                                 type="button"
-                                className="btn btn-sm btn-link collapse-btn"
+                                className="btn-link collapse-btn"
                                 onClick={() => {
                                   const collapseId = `sibling-${index}`;
                                   document.getElementById(collapseId)?.classList.toggle('show');
                                 }}
                               >
-                                Toggle
-                              </button>
+                                <img src={acc1} alt="" />
+                              </button> */}
                             </div>
                             <div id={`sibling-${index}`} className="sibling-card-body show">
                               <div className="row">
@@ -463,7 +465,7 @@ const MyProfile = () => {
                                   <div className="form-group">
                                     <label className="form-label">Sibling {index + 1} is:</label>
                                     <div className="radio-group">
-                                      <label className="radio-label">
+                                      <label className="radio-container">
                                         <input
                                           type="radio"
                                           name={`sibling-${index}-order`}
@@ -471,9 +473,10 @@ const MyProfile = () => {
                                           checked={sibling.order === 'Older'}
                                           onChange={() => handleSiblingDetailChange(index, "order", "Older")}
                                         />
-                                        <span>Older</span>
+                                        Older
+                                        <span className="checkmark"></span>
                                       </label>
-                                      <label className="radio-label">
+                                      <label className="radio-container">
                                         <input
                                           type="radio"
                                           name={`sibling-${index}-order`}
@@ -481,7 +484,8 @@ const MyProfile = () => {
                                           checked={sibling.order === 'Younger'}
                                           onChange={() => handleSiblingDetailChange(index, "order", "Younger")}
                                         />
-                                        <span>Younger</span>
+                                        Younger
+                                        <span className="checkmark"></span>
                                       </label>
                                     </div>
                                   </div>
@@ -492,7 +496,7 @@ const MyProfile = () => {
                                   <div className="form-group">
                                     <label className="form-label">Sibling {index + 1} is:</label>
                                     <div className="radio-group">
-                                      <label className="radio-label">
+                                      <label className="radio-container">
                                         <input
                                           type="radio"
                                           name={`sibling-${index}-gender`}
@@ -500,9 +504,10 @@ const MyProfile = () => {
                                           checked={sibling.gender === 'Male'}
                                           onChange={() => handleSiblingDetailChange(index, "gender", "Male")}
                                         />
-                                        <span>Male</span>
+                                        Male
+                                        <span className="checkmark"></span>
                                       </label>
-                                      <label className="radio-label">
+                                      <label className="radio-container">
                                         <input
                                           type="radio"
                                           name={`sibling-${index}-gender`}
@@ -510,9 +515,10 @@ const MyProfile = () => {
                                           checked={sibling.gender === 'Female'}
                                           onChange={() => handleSiblingDetailChange(index, "gender", "Female")}
                                         />
-                                        <span>Female</span>
+                                        Female
+                                        <span className="checkmark"></span>
                                       </label>
-                                      <label className="radio-label">
+                                      <label className="radio-container">
                                         <input
                                           type="radio"
                                           name={`sibling-${index}-gender`}
@@ -520,7 +526,8 @@ const MyProfile = () => {
                                           checked={sibling.gender === 'Other'}
                                           onChange={() => handleSiblingDetailChange(index, "gender", "Other")}
                                         />
-                                        <span>Other</span>
+                                        Other
+                                        <span className="checkmark"></span>
                                       </label>
                                     </div>
                                   </div>
@@ -539,20 +546,21 @@ const MyProfile = () => {
                       <label className="form-label">As you consider the music you enjoy, which genres feel meaningful or familiar to you? Choose all that apply.</label>
                       <div className="music-genres-grid">
                         {musicGenresList.map((genre) => (
-                          <div key={genre} className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id={`genre-${genre}`}
-                              value={genre}
-                              checked={musicGenres?.includes(genre)}
-                              onChange={(e) => handleMusicGenreChange(genre, e.target.checked)}
-                            />
-                            <label className="form-check-label" htmlFor={`genre-${genre}`}>
-                              {genre}
-                            </label>
-                          </div>
-                        ))}
+                          <div key={genre} className="form-check p-0 mb-3">
+                            <label className="form-check-label checkbox-container" htmlFor={`genre-${genre}`}>
+                                <input
+                                  type="checkbox"
+                                  className="form-check-input"
+                                  id={`genre-${genre}`}
+                                  value={genre}
+                                  checked={musicGenres?.includes(genre)}
+                                  onChange={(e) => handleMusicGenreChange(genre, e.target.checked)}
+                                />
+                                  {genre}
+                                  <span className="checkmark"></span>
+                                </label>
+                              </div>
+                            ))}
                       </div>
                     </div>
                   </div>

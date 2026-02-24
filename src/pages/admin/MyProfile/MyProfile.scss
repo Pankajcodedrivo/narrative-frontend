@@ -38,3 +38,106 @@
         }
     }
 }
+.sibling-card-body .radio-container .checkmark {
+    @media (max-width:1680px) { 
+        top: 3.8px;
+    }
+}
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    @media (max-width:575px) { 
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+.sibling-card-header {
+  background: rgba(225, 216, 204, 0.14);
+  padding: 12px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  button {
+    padding: 0;
+    background: transparent;
+    border: 0;
+  }
+  h6 {
+    margin-bottom: 0;
+  }
+}
+.sibling-card-body {
+    padding: 12px;
+    &.show {
+        display: block;
+    }
+}
+.profile-form {
+    .checkbox-container {
+        color: var(--color-a1);
+    }
+    .checkbox-container input:checked ~ .checkmark {
+        background-color: var(--color-a1);
+    }
+    .checkbox-container .checkmark {
+        border-color: var(--color-a1);
+    }
+    .form-control[type="file"] {
+        padding-top: 16px;
+        padding-bottom: 16px;
+        @media (max-width:1199px) { 
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+}
+.numeric-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-a1);
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 100px;
+  justify-content: space-between;
+}
+
+.numeric-stepper button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.numeric-stepper .stepper-value ,.numeric-stepper input{
+  width: 50px;
+  height: 40px;
+  text-align: center;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.numeric-stepper input::-webkit-outer-spin-button,
+.numeric-stepper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numeric-stepper input[type=number] {
+  -moz-appearance: textfield;
+}
+.numeric-stepper-wrapper {
+    label {
+        @media (max-width:575px) { 
+            margin-bottom: 10px!important;
+        }
+    }
+}
