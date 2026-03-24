@@ -17,7 +17,7 @@ const Login = () => {
         <LeftPanel title="Sign in to manage your dashboard and activities." />
         <div className="right-panel">
             <div className="right-panel-wrapper">
-                <div className="auth-logo mb-5"><img src={logo} alt="" /></div>
+                <div className="auth-logo mb-5"><Link to="/"><img src={logo} alt="" /></Link></div>
                 <SubHeader title="Welcome Back!" desc="Continue creating and preserving your cherished stories." />
                 <form
                     onSubmit={(e) => {

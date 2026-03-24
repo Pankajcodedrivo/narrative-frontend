@@ -17,7 +17,7 @@ const Registration = () => {
         <LeftPanel title="Welcome! Let’s set up your account in a few steps." />
         <div className="right-panel">
             <div className="right-panel-wrapper">
-                <div className="auth-logo mb-5"><img src={logo} alt="" /></div>
+                <div className="auth-logo mb-5"><Link to="/"><img src={logo} alt="" /></Link></div>
                 <SubHeader title="Create Your Account" desc="Start your journey to capturing life stories in a meaningful way." />
                 <form
                     onSubmit={(e) => {

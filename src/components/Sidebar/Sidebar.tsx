@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import logo from "../../assets/images/logo-wh.svg";
@@ -37,6 +37,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
     navigate("/login");
   };
 
+  const location = useLocation();
+
   return (
     <div className={`sidebar ${isOpen ? "open" : ""}`}>
       <div className="sidebar-innr">
@@ -48,8 +50,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
           <img src={logo} alt="logo" />
         </div>
 
-        <ul className="sidebar-list">
-          <li>
+        <ul className="sidebar-list"> 
+          <li className={location.pathname === "/dashboard" ? "active" : ""}>
             <Link to="/dashboard">
               <span>
                 <img className="icon" src={icon1} alt="" />
@@ -59,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
             </Link>
           </li>
 
-          <li>
+          <li className={location.pathname === "/my-profile" ? "active" : ""}>
             <Link to="/my-profile">
               <span>
                 <img className="icon" src={icon2} alt="" />
@@ -69,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
             </Link>
           </li>
 
-          <li>
+          <li className={location.pathname === "/my-interviews" ? "active" : ""}>
             <Link to="/my-interviews">
               <span>
                 <img className="icon" src={icon3} alt="" />
@@ -79,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
             </Link>
           </li>
 
-          <li>
+          <li className={location.pathname === "/need-assistance" ? "active" : ""}> 
             <Link to="/need-assistance">
               <span>
                 <img className="icon" src={icon4} alt="" />
@@ -89,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
             </Link>
           </li>
 
-          <li>
+          <li className={location.pathname === "/my-collections" ? "active" : ""}>
             <Link to="/my-collections">
               <span>
                 <img className="icon" src={icon5} alt="" />

@@ -1,11 +1,11 @@
 // MyProfile.tsx
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import AccordionItem from "../../../components/AccordionItem/AccordionItem";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 import profileImg from "../../../assets/images/profile-lg.png";
 import edit from "../../../assets/images/edit.svg";
-import acc1 from "../../../assets/images/acc-open.svg";
-import acc2 from "../../../assets/images/acc-close.svg";
+// import acc1 from "../../../assets/images/acc-open.svg";
+// import acc2 from "../../../assets/images/acc-close.svg";
 import { useProfile, SECTION_FIELDS } from "./useProfile";
 import "./MyProfile.scss";
 
@@ -19,7 +19,7 @@ const MyProfile = () => {
     handleChange,
     handleBlur,
     handleSubmit,
-    setFieldValue,
+    // setFieldValue,
     storyLocked,
     handleSiblingsChange,
     handleSiblingDetailChange,
@@ -56,6 +56,7 @@ const MyProfile = () => {
     2: useRef<HTMLDivElement>(null),
     3: useRef<HTMLDivElement>(null),
     4: useRef<HTMLDivElement>(null),
+    5: useRef<HTMLDivElement>(null),
   };
 
   // Handle Next button click
@@ -1506,6 +1507,22 @@ const MyProfile = () => {
                       Previous
                     </button>
                   </div>
+                </div>
+              </div>
+            </AccordionItem>
+          </div>
+
+        {/* ================= ALL USER UPLOADED IMAGES ================= */}
+          <div ref={sectionRefs[5]}>
+            <AccordionItem
+              title="User Uploaded Images"
+              isOpen={openIndex === 5}
+              onToggle={() => setOpenIndex(openIndex === 5 ? null : 5)}
+            >
+              <div className="profile-form">
+                <p>These are all user uploaded images which is uploaded by user during interview</p>
+                <div className="row">
+                    <h6>Coming Soon!</h6>
                 </div>
               </div>
             </AccordionItem>
