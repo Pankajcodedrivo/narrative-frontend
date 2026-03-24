@@ -18,7 +18,7 @@ import iconHover6 from "../../assets/images/icon-hover-6.svg";
 
 import close from "../../assets/images/cross.svg";
 
-import { logOut } from "../../../store/auth.store";
+import { logOut } from "../../store/auth.store";
 
 import "./Sidebar.scss";
 

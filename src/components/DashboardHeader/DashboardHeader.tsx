@@ -6,7 +6,7 @@ import user from "../../assets/images/avtar.png";
 import tick from "../../assets/images/tick.png";
 import menu from "../../assets/images/menu.png";
 
-import { logOut } from "../../../store/auth.store";
+import { logOut } from "../../store/auth.store";
 
 import "./DashboardHeader.scss";
 

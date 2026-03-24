@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { forgotPasswordApi } from "../../../../services/apis/auth.api";
+import { forgotPasswordApi } from "../../../services/apis/auth.api";
 import { useNavigate } from "react-router-dom";
 
 export const useForgotPass = () => {

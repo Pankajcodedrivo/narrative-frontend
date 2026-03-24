@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { emailSchema, passwordSchema } from "../../../../utils/yupSchemas";
-import { logInApi } from "../../../../services/apis/auth.api";
+import { emailSchema, passwordSchema } from "../../../utils/yupSchemas";
+import { logInApi } from "../../../services/apis/auth.api";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../../../store/auth.store";
+import { setUser } from "../../../store/auth.store";
 import { useNavigate } from "react-router-dom";
 
 export const useLogin = () => {

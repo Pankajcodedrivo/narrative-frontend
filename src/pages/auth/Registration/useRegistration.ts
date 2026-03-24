@@ -1,8 +1,8 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { registrationApi } from "../../../../services/apis/auth.api";
+import { registrationApi } from "../../../services/apis/auth.api";
 import { useNavigate } from "react-router-dom";
-import { fnameSchema, lnameSchema, emailSchema, confirmPasswordSchema, passwordSchema } from "../../../../utils/yupSchemas";
+import { fnameSchema, lnameSchema, emailSchema, confirmPasswordSchema, passwordSchema } from "../../../utils/yupSchemas";
 
 // Define the shape of the form values
 interface RegistrationFormValues {

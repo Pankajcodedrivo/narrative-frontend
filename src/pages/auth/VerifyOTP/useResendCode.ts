@@ -1,4 +1,4 @@
-import { forgotPasswordApi } from "../../../../services/apis/auth.api";
+import { forgotPasswordApi } from "../../../services/apis/auth.api";
 
 export const useResendCode = () => {
   const resendCode = async () => {
