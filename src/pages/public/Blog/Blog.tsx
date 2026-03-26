@@ -5,19 +5,25 @@ import ReviewSection from "../../../components/Review/ReviewSection";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import { getBlogs } from "../../../services/apis/blog.api";
 import "./Blog.scss";
+import { useNavigate } from "react-router-dom";
 
 const Blog = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchBlogs = async (currentPage: number) => {
     setLoading(true);
     try {
       const data = await getBlogs(currentPage, 6);
-      setBlogs(data.blogData.Blogs);
-      setTotalPages(data.blogData.totalPages);
+      console.log(data);
+
+      // setBlogs(data.blogData.Blogs);
+      // setTotalPages(data.blogData.totalPages);
+      setBlogs(data.result.blogs);
+      setTotalPages(data.result.totalPages);
     } catch (err) {
       console.error(err);
     } finally {
@@ -44,9 +50,12 @@ const Blog = () => {
 
           <div className="blog-wrapper">
             <div className="row g-4">
-              {/* 🔥 Dynamic Blogs */}
-              {blogs.map((blog) => (
-                <div className="col-lg-4 col-md-6" key={blog._id}>
+              {blogs.map((blog, index) => (
+                <div
+                  className="col-lg-4 col-md-6"
+                  key={blog._id || index}
+                  onClick={() => navigate(`/blog/${blog.slug}`)}
+                >
                   <BlogCard
                     image={blog.featuredImage}
                     title={blog.title}
@@ -56,7 +65,6 @@ const Blog = () => {
               ))}
             </div>
 
-            {/* 🔥 Pagination UI (minimal, no UI change) */}
             <div className="text-center mt-4">
               <button
                 disabled={page === 1}
