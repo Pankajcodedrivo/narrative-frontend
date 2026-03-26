@@ -45,7 +45,7 @@ const BlogDetails = () => {
     setLoading(true);
     try {
       const res = await getBlogDetails(slug!);
-      setBlog(res.blog);
+      setBlog(res.result);
     } catch (err) {
       console.error(err);
     } finally {

@@ -29,12 +29,11 @@ let isRefreshing = false;
 axios.interceptors.response.use(
   // ✅ SUCCESS HANDLER
   (response) => {
-    const message =
-      response?.data?.message || response?.data?.responseMessage;
+    // const message = response?.data?.message || response?.data?.responseMessage;
 
-    if (message) {
-      toast.success(message);
-    }
+    // if (message) {
+    //   toast.success(message);
+    // }
 
     retryCount = 0;
     return response;
@@ -102,7 +101,7 @@ axios.interceptors.response.use(
 
     retryCount = 0;
     return Promise.reject(error);
-  }
+  },
 );
 
 /* =======================

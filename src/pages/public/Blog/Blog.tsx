@@ -18,8 +18,12 @@ const Blog = () => {
     setLoading(true);
     try {
       const data = await getBlogs(currentPage, 6);
-      setBlogs(data.blogData.Blogs);
-      setTotalPages(data.blogData.totalPages);
+      console.log(data);
+
+      // setBlogs(data.blogData.Blogs);
+      // setTotalPages(data.blogData.totalPages);
+      setBlogs(data.result.blogs);
+      setTotalPages(data.result.totalPages);
     } catch (err) {
       console.error(err);
     } finally {
