@@ -96,7 +96,7 @@ const Home = () => {
           <div className="row g-4">
             <div className="col-md-4">
               <div className="plans-card">
-                <h2>₹499<span>/month</span></h2>
+                <h2>$499<span>/month</span></h2>
                 <h3>Basic Plan – <span>Starter Story</span></h3>
                 <p>Ideal for first-time users.</p>
                 <ul className="cmn-list">
@@ -114,7 +114,7 @@ const Home = () => {
             <div className="col-md-4">
               <div className="plans-card">
                 <span className="plans-tag">Most Popular</span>
-                <h2>₹1,299<span>/month</span></h2>
+                <h2>$1,299<span>/month</span></h2>
                 <h3>Basic Plan – <span> Most Popular</span></h3>
                 <p>For families & meaningful storytelling.</p>
                 <ul className="cmn-list">
@@ -131,7 +131,7 @@ const Home = () => {
             </div>
             <div className="col-md-4">
               <div className="plans-card">
-                <h2>₹3,999<span>/month</span></h2>
+                <h2>$3,999<span>/month</span></h2>
                 <h3>Basic Plan – <span> Professional</span></h3>
                 <p>For creators, filmmakers & agencies</p>
                 <ul className="cmn-list">
@@ -210,7 +210,7 @@ const Home = () => {
         </div>
         <div className="circle"><img src={circle} alt="" /></div>
       </section>
-      <section className="platform-sec common-gap" id="features">
+      <section className="platform-sec common-gap">
         <div className="container">
           <div className="text-center">
             <SubHeader title="Why this Platform?" desc="We merge advanced AI technology with thoughtful design to ensure your memories are captured authentically and transformed into a polished, heartfelt tribute." />
@@ -243,7 +243,7 @@ const Home = () => {
         <div className="right-curve"><img src={rightCurve} alt="" /></div>
         <div className="shape-3"><img src={shape3} alt="" /></div>
       </section>
-      <section className="common-gap">
+      <section className="common-gap" id="features">
         <div className="container">
           <div className="cmn-top">
             <SubHeader title="AI powered video creation" desc="Your words and memories become a heartfelt video, carefully crafted by AI to reflect your journey with clarity and emotion. Our intelligent AI crafts meaningful videos from your content, ensuring every moment feels alive and beautifully curated." />
