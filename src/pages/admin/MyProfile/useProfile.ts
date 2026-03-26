@@ -1,9 +1,11 @@
 // hooks/useProfile.ts
 import { useFormik } from 'formik';
 import { useState, useEffect } from 'react';
-import { profileSchema } from '../../../../utils/yupSchemas';
-import type { ProfileFormData } from '../../../../utils/yupSchemas';
-import { getProfile, updateProfile } from '../../../../services/apis/user.api';
+import { profileSchema } from '../../../utils/yupSchemas';
+import type { ProfileFormData } from '../../../utils/yupSchemas';
+import { getProfile, updateProfile } from '../../../services/apis/user.api';
+import { updateUserProfile } from '../../../store/auth.store';
+import { useDispatch } from 'react-redux';
 
 // Types - UPDATED: Changed from 'type' to 'gender'
 export type Sibling = {
@@ -181,7 +183,7 @@ export const useProfile = (): UseProfileReturn => {
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [referenceImages, setReferenceImages] = useState<ReferenceImages>({});
   const [musicGenres, setMusicGenres] = useState<string[]>([]);
-  
+  const dispatch = useDispatch();
   const formik = useFormik<ProfileFormData>({
     initialValues,
     validationSchema: profileSchema,
@@ -257,6 +259,7 @@ export const useProfile = (): UseProfileReturn => {
         
         if (response.success) {
           if (response.data?.user) {
+            dispatch(updateUserProfile(response.data?.user));
             await loadUserProfile();
           }
         }

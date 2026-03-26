@@ -5,38 +5,58 @@ import "./header.scss";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    return (
-        <header className="header">
-            <div className="container">
-                <div className="header-otr">
-                    <Link to="/" className="logo"><img src={logo} alt="" /></Link>
-                    <div className={`mobile-menu ${open ? "show" : ""}`}>
-                        <div className="navbar">
-                            <ul>
-                                <li><Link to="/">How It Works</Link></li>
-                                <li><Link to="/">Features</Link></li>
-                                <li><Link to="/faq">FAQ’s</Link></li>
-                                <li><Link to="/blog">Blog</Link></li>
-                                <li><Link to="/contact">Help Center</Link></li>
-                                <li><Link to="/contact">Contact</Link></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <button type="button" className="btn btn-outline" onClick={() => navigate("/login")}>Login/Register</button>
-                    <div
-                        className={`hamburger ${open ? "active" : ""}`}
-                        onClick={() => setOpen(!open)}
-                    >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  return (
+    <header className="header">
+      <div className="container">
+        <div className="header-otr">
+          <Link to="/" className="logo">
+            <img src={logo} alt="" />
+          </Link>
+          <div className={`mobile-menu ${open ? "show" : ""}`}>
+            <div className="navbar">
+              <ul>
+                <li>
+                  <Link to="/">How It Works</Link>
+                </li>
+                <li>
+                  <Link to="/">Features</Link>
+                </li>
+                <li>
+                  <Link to="/faq">FAQ’s</Link>
+                </li>
+                <li>
+                  <Link to="/blog">Blog</Link>
+                </li>
+                <li>
+                  <Link to="/">Help Center</Link>
+                </li>
+                <li>
+                  <Link to="/contact">Contact</Link>
+                </li>
+              </ul>
             </div>
-        </header>
-    );
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => navigate("/login")}
+          >
+            Login/Register
+          </button>
+          <div
+            className={`hamburger ${open ? "active" : ""}`}
+            onClick={() => setOpen(!open)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 };
 
 export default Header;

@@ -1,8 +1,8 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { changePasswordApi } from "../../../../services/apis/auth.api";
+import { changePasswordApi } from "../../../services/apis/auth.api";
 import { useNavigate } from "react-router-dom";
-import { oldPasswordSchema, newPasswordSchema, confirmPasswordSchema } from "../../../../utils/yupSchemas";
+import { oldPasswordSchema, newPasswordSchema, confirmPasswordSchema } from "../../../utils/yupSchemas";
 
 // Define the shape of the form values
 interface ResetPasswordFormValues {

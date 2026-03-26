@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { verifySecurityCodeApi } from "../../../../services/apis/auth.api";
+import { verifySecurityCodeApi } from "../../../services/apis/auth.api";
 
 export const useVerifySecurityCode = () => {
   const navigate = useNavigate();
