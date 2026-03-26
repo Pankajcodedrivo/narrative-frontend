@@ -142,3 +142,15 @@
         }
     }
 }
+.music-genres-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+    .form-check {
+        width: calc(100% / 3);
+        padding: 0 10px;
+        @media (max-width:991px) { 
+            width: calc(100% / 2);
+        }
+    }
+}
