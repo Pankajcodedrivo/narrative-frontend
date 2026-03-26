@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import { contactSchema } from "../../../utils/validation/contact.schema";
 import { sendContact } from "../../../services/apis/contact.api";
+import toast from "react-hot-toast";
 
 const useContact = () => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,8 @@ const useContact = () => {
           message: values.message,
         };
 
-        await sendContact(payload);
+        const response = await sendContact(payload);
+        toast.success(response?.message || "Message sent successfully!");
 
         resetForm();
       } catch (error: any) {
