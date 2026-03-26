@@ -5,11 +5,18 @@ import ReviewSection from "../../../components/Review/ReviewSection";
 import SubHeader from "../../../components/SubHeader/SubHeader";
 import "./Faq.scss";
 import { getFaqs } from "../../../services/apis/faq.api";
+import DOMPurify from "dompurify";
 
 type FAQ = {
   _id: string;
   question: string;
   answer: string;
+};
+
+const decodeHtml = (html: string) => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
 };
 
 const Faq = () => {
@@ -21,10 +28,9 @@ const Faq = () => {
     const fetchFaqs = async () => {
       try {
         const response = await getFaqs(1, 10);
-        console.log(response);
 
-        if (response && response.faqs) {
-          setFaqs(response.faqs.faqs);
+        if (response && response.result && response.result.faqs) {
+          setFaqs(response.result.faqs);
         }
       } catch (error) {
         console.error("Error fetching FAQs", error);
@@ -263,7 +269,11 @@ const Faq = () => {
                       setOpenIndex(openIndex === index ? null : index)
                     }
                   >
-                    <p>{faq.answer}</p>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(decodeHtml(faq.answer)),
+                      }}
+                    />
                   </AccordionItem>
                 ))
               ) : (
