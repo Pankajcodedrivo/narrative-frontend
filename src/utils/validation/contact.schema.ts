@@ -6,6 +6,5 @@ export const contactSchema = Yup.object({
   lastname: Yup.string().required("Last Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phone: Yup.string(),
-  subject: Yup.string().required("Subject is required"),
   message: Yup.string().required("Message is required"),
 });

@@ -87,26 +87,6 @@ const Contact = () => {
                 />
               </div>
             </div>
-            <div className="col-md-6">
-              <div className="form-group">
-                <label className="form-label float">Subject*</label>
-                <select
-                  className="form-control"
-                  name="subject"
-                  value={formik.values.subject}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                >
-                  <option value="">Select</option>
-                  <option value="General">General</option>
-                  <option value="Support">Support</option>
-                  <option value="Feedback">Feedback</option>
-                </select>
-                {formik.touched.subject && formik.errors.subject && (
-                  <p className="error">{formik.errors.subject}</p>
-                )}
-              </div>
-            </div>
             <div className="col-md-12">
               <div className="form-group">
                 <label className="form-label float">Message</label>

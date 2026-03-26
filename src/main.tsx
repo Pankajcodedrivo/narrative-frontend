@@ -8,6 +8,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "react-hot-toast";
 import "./services/httpsCall";
 import { store, persistedStore } from "./store/store.ts";
+import ScrollToHashElement from './components/ScrollToHashElement';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')!).render(
       <PersistGate loading={null} persistor={persistedStore}>
         <BrowserRouter>
           <Toaster position="top-right" reverseOrder={false} />
+          <ScrollToHashElement />
           <App />
         </BrowserRouter>
       </PersistGate>

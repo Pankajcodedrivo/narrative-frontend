@@ -149,7 +149,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <section className="how-it-works-sec common-gap">
+      <section className="how-it-works-sec common-gap" id="how-it-works">
         <div className="container">
           <div className="how-it-works-hdr">
             <SubHeader title="How it works?" desc="A guided, step-by-step journey that helps you record your memories and transform them into a beautifully crafted story— making it easy to preserve moments, emotions, and experiences in a meaningful way." />
@@ -210,7 +210,7 @@ const Home = () => {
         </div>
         <div className="circle"><img src={circle} alt="" /></div>
       </section>
-      <section className="platform-sec common-gap">
+      <section className="platform-sec common-gap" id="features">
         <div className="container">
           <div className="text-center">
             <SubHeader title="Why this Platform?" desc="We merge advanced AI technology with thoughtful design to ensure your memories are captured authentically and transformed into a polished, heartfelt tribute." />

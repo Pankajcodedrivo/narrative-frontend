@@ -12,7 +12,6 @@ const useContact = () => {
       lastname: "",
       email: "",
       phone: "",
-      subject: "",
       message: "",
     },
 
@@ -28,7 +27,6 @@ const useContact = () => {
           lastname: values.lastname,
           email: values.email,
           phone: values.phone,
-          subject: values.subject,
           message: values.message,
         };
 
