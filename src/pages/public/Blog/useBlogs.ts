@@ -34,12 +34,13 @@ const getBlogCategoryNames = (blog: BlogItem) => {
   return [];
 };
 
+const PAGE_SIZE = 6;
+
 const useBlogs = () => {
-  const [blogs, setBlogs] = useState<BlogItem[]>([]);
+  const [allBlogs, setAllBlogs] = useState<BlogItem[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -47,20 +48,34 @@ const useBlogs = () => {
       setLoading(true);
 
       try {
-        const res = await getBlogs(page, 6);
-        setBlogs(res?.result?.blogs ?? []);
-        setTotalPages(res?.result?.totalPages ?? 1);
+        const firstPageRes = await getBlogs(1, PAGE_SIZE);
+        const firstPageBlogs = (firstPageRes?.result?.blogs ?? []) as BlogItem[];
+        const totalApiPages = firstPageRes?.result?.totalPages ?? 1;
+
+        if (totalApiPages <= 1) {
+          setAllBlogs(firstPageBlogs);
+          return;
+        }
+
+        const pageRequests = Array.from({ length: totalApiPages - 1 }, (_, idx) =>
+          getBlogs(idx + 2, PAGE_SIZE),
+        );
+        const remainingPages = await Promise.all(pageRequests);
+        const remainingBlogs = remainingPages.flatMap(
+          (res) => (res?.result?.blogs ?? []) as BlogItem[],
+        );
+
+        setAllBlogs([...firstPageBlogs, ...remainingBlogs]);
       } catch (error) {
         console.error(error);
-        setBlogs([]);
-        setTotalPages(1);
+        setAllBlogs([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchBlogs();
-  }, [page]);
+  }, []);
 
   useEffect(() => {
     const fetchCategoryOptions = async () => {
@@ -82,13 +97,28 @@ const useBlogs = () => {
     fetchCategoryOptions();
   }, []);
 
-  const filteredBlogs = selectedCategories.length
-    ? blogs.filter((blog) =>
+  const filteredAllBlogs = selectedCategories.length
+    ? allBlogs.filter((blog) =>
         selectedCategories.some((category) =>
           getBlogCategoryNames(blog).includes(category),
         ),
       )
-    : blogs;
+    : allBlogs;
+
+  const totalPages = Math.max(1, Math.ceil(filteredAllBlogs.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const start = (page - 1) * PAGE_SIZE;
+  const filteredBlogs = filteredAllBlogs.slice(start, start + PAGE_SIZE);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
