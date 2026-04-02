@@ -124,6 +124,7 @@ const useBlogs = () => {
   }, [page, totalPages]);
 
   const start = (page - 1) * PAGE_SIZE;
+
   const filteredBlogs = filteredAllBlogs.slice(start, start + PAGE_SIZE);
 
   const toggleCategory = (category: string) => {
