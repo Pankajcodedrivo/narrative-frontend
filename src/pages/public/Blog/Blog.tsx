@@ -86,27 +86,29 @@ const Blog = () => {
               </div>
             )}
 
-            <div className="text-center mt-4">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
-                className="btn btn-secondary me-2"
-              >
-                Prev
-              </button>
+            {totalPages > 1 && (
+              <div className="text-center mt-4">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                  className="btn btn-secondary me-2"
+                >
+                  Prev
+                </button>
 
-              <span>
-                Page {page} of {totalPages}
-              </span>
+                <span>
+                  Page {page} of {totalPages}
+                </span>
 
-              <button
-                disabled={page === totalPages}
-                onClick={() => setPage(page + 1)}
-                className="btn btn-secondary ms-2"
-              >
-                Next
-              </button>
-            </div>
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                  className="btn btn-secondary ms-2"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
