@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBlogs } from "../../../services/apis/blog.api";
+import { getBlogCategories, getBlogs } from "../../../services/apis/blog.api";
 
 export type BlogItem = {
   _id?: string;
@@ -12,14 +12,19 @@ export type BlogItem = {
   categories?: string | { name?: string } | Array<string | { name?: string }>;
 };
 
-const getBlogCategories = (blog: BlogItem) => {
+type BlogCategoryItem = {
+  _id?: string;
+  name?: string;
+};
+
+const getBlogCategoryNames = (blog: BlogItem) => {
   if (blog.blogCategory?.name) return [blog.blogCategory.name];
 
   const value = blog.categories ?? blog.category;
 
   if (Array.isArray(value)) {
     return value
-      .map((item) => (typeof item === "string" ? item : item?.name ?? ""))
+      .map((item) => (typeof item === "string" ? item : (item?.name ?? "")))
       .filter(Boolean);
   }
 
@@ -31,6 +36,7 @@ const getBlogCategories = (blog: BlogItem) => {
 
 const useBlogs = () => {
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -56,14 +62,30 @@ const useBlogs = () => {
     fetchBlogs();
   }, [page]);
 
-  const categoryOptions = Array.from(
-    new Set(blogs.flatMap((blog) => getBlogCategories(blog))),
-  );
+  useEffect(() => {
+    const fetchCategoryOptions = async () => {
+      try {
+        const res = await getBlogCategories(1, 50);
+        const categories = (res?.result?.categories ?? []) as BlogCategoryItem[];
+
+        setCategoryOptions(
+          categories
+            .map((category) => category.name?.trim() ?? "")
+            .filter(Boolean),
+        );
+      } catch (error) {
+        console.error(error);
+        setCategoryOptions([]);
+      }
+    };
+
+    fetchCategoryOptions();
+  }, []);
 
   const filteredBlogs = selectedCategories.length
     ? blogs.filter((blog) =>
         selectedCategories.some((category) =>
-          getBlogCategories(blog).includes(category),
+          getBlogCategoryNames(blog).includes(category),
         ),
       )
     : blogs;
