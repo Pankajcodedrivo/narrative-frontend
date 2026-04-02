@@ -24,14 +24,26 @@
 
 import httpsCall from "../httpsCall";
 
-export const getBlogs = async (page = 1, limit = 6, search = "") => {
+export const getBlogs = async (
+  page = 1,
+  limit = 6,
+  search = "",
+  category = "",
+) => {
   const res = await httpsCall.get(
-    `/blog?page=${page}&limit=${limit}&search=${search}`,
+    `/blog?page=${page}&limit=${limit}&search=${search}&category=${category}`,
   );
   return res.data;
 };
 
 export const getBlogDetails = async (slug: string) => {
   const res = await httpsCall.get(`/blog/${slug}`);
+  return res.data;
+};
+
+export const getBlogCategories = async (page = 1, limit = 100, search = "") => {
+  const res = await httpsCall.get(
+    `/blog-category?page=${page}&limit=${limit}&search=${search}`,
+  );
   return res.data;
 };

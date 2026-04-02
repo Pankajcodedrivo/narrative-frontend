@@ -1,37 +1,91 @@
 import { useEffect, useState } from "react";
 import { getBlogs } from "../../../services/apis/blog.api";
 
+export type BlogItem = {
+  _id?: string;
+  slug?: string;
+  featuredImage?: string;
+  title?: string;
+  excerpt?: string;
+  blogCategory?: { name?: string };
+  category?: string | { name?: string } | Array<string | { name?: string }>;
+  categories?: string | { name?: string } | Array<string | { name?: string }>;
+};
+
+const getBlogCategories = (blog: BlogItem) => {
+  if (blog.blogCategory?.name) return [blog.blogCategory.name];
+
+  const value = blog.categories ?? blog.category;
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item : item?.name ?? ""))
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") return value.trim() ? [value.trim()] : [];
+  if (value?.name) return [value.name];
+
+  return [];
+};
+
 const useBlogs = () => {
-  const [blogs, setBlogs] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const fetchBlogs = async (currentPage: number) => {
-    setLoading(true);
-    try {
-      const res = await getBlogs(currentPage, 6);
-      // setBlogs(res.blogs);
-      // setTotalPages(res.totalPages);
-      setBlogs(res.blogData.Blogs);
-      setTotalPages(res.blogData.totalPages);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchBlogs(page);
+    const fetchBlogs = async () => {
+      setLoading(true);
+
+      try {
+        const res = await getBlogs(page, 6);
+        setBlogs(res?.result?.blogs ?? []);
+        setTotalPages(res?.result?.totalPages ?? 1);
+      } catch (error) {
+        console.error(error);
+        setBlogs([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, [page]);
 
+  const categoryOptions = Array.from(
+    new Set(blogs.flatMap((blog) => getBlogCategories(blog))),
+  );
+
+  const filteredBlogs = selectedCategories.length
+    ? blogs.filter((blog) =>
+        selectedCategories.some((category) =>
+          getBlogCategories(blog).includes(category),
+        ),
+      )
+    : blogs;
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category],
+    );
+  };
+
   return {
-    blogs,
+    filteredBlogs,
+    categoryOptions,
+    selectedCategories,
     loading,
     page,
     totalPages,
     setPage,
+    setSelectedCategories,
+    toggleCategory,
   };
 };
 
