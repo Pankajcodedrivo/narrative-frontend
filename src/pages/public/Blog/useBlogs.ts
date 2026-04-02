@@ -49,7 +49,8 @@ const useBlogs = () => {
 
       try {
         const firstPageRes = await getBlogs(1, PAGE_SIZE);
-        const firstPageBlogs = (firstPageRes?.result?.blogs ?? []) as BlogItem[];
+        const firstPageBlogs = (firstPageRes?.result?.blogs ??
+          []) as BlogItem[];
         const totalApiPages = firstPageRes?.result?.totalPages ?? 1;
 
         if (totalApiPages <= 1) {
@@ -57,8 +58,9 @@ const useBlogs = () => {
           return;
         }
 
-        const pageRequests = Array.from({ length: totalApiPages - 1 }, (_, idx) =>
-          getBlogs(idx + 2, PAGE_SIZE),
+        const pageRequests = Array.from(
+          { length: totalApiPages - 1 },
+          (_, idx) => getBlogs(idx + 2, PAGE_SIZE),
         );
         const remainingPages = await Promise.all(pageRequests);
         const remainingBlogs = remainingPages.flatMap(
@@ -81,7 +83,8 @@ const useBlogs = () => {
     const fetchCategoryOptions = async () => {
       try {
         const res = await getBlogCategories(1, 50);
-        const categories = (res?.result?.categories ?? []) as BlogCategoryItem[];
+        const categories = (res?.result?.categories ??
+          []) as BlogCategoryItem[];
 
         setCategoryOptions(
           categories
@@ -105,7 +108,10 @@ const useBlogs = () => {
       )
     : allBlogs;
 
-  const totalPages = Math.max(1, Math.ceil(filteredAllBlogs.length / PAGE_SIZE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredAllBlogs.length / PAGE_SIZE),
+  );
 
   useEffect(() => {
     setPage(1);
