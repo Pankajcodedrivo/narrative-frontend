@@ -34,6 +34,8 @@ function makeId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
 }
 
+const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|bmp|svg)$/i;
+
 const MyInterviews = () => {
   const { isLoading, questions, bookends } = useInterviewQuestions();
 
@@ -67,6 +69,10 @@ const MyInterviews = () => {
   // textarea draft + optional image
   const [draftText, setDraftText] = useState("");
   const [draftImageUrl, setDraftImageUrl] = useState<string | null>(null);
+  const [draftImageError, setDraftImageError] = useState<string | null>(null);
+  const [draftImageStatus, setDraftImageStatus] = useState<"idle" | "loading">(
+    "idle",
+  );
   const [sentMessages, setSentMessages] = useState<SentMessage[]>([]);
   const [isInterviewDone, setIsInterviewDone] = useState(false);
   const [isRendering, setIsRendering] = useState(false);
@@ -85,6 +91,8 @@ const MyInterviews = () => {
   const avatarVideoRef = useRef<HTMLVideoElement | null>(null);
   const introVideoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imagePickTokenRef = useRef(0);
+  const draftImageUrlRef = useRef<string | null>(null);
   const stopCameraRef = useRef(stopCamera);
   const speechCleanupRef = useRef(speech.cleanup);
 
@@ -120,10 +128,25 @@ const MyInterviews = () => {
     return { index, total };
   }, [currentFlow.length, flowIndex]);
 
-  const draftTranscript = speech.draftTranscript;
   const showIntro = phase === "intro";
   const showTour = phase === "tour" || manualTourOpen;
   const interviewActive = phase === "interview";
+
+  useEffect(() => {
+    draftImageUrlRef.current = draftImageUrl;
+  }, [draftImageUrl]);
+
+  useEffect(() => {
+    return () => {
+      const url = draftImageUrlRef.current;
+      if (!url) return;
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!interviewActive) return;
@@ -239,7 +262,14 @@ const MyInterviews = () => {
   async function startRecording() {
     if (!interviewActive) return;
     setDraftText("");
-    setDraftImageUrl(null);
+    imagePickTokenRef.current += 1;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setDraftImageError(null);
+    setDraftImageStatus("idle");
+    setDraftImageUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     const err = await speech.start();
     if (err) setDraftText(err);
   }
@@ -266,7 +296,14 @@ const MyInterviews = () => {
   function nextQuestion() {
     setDraftText("");
     speech.reset();
-    setDraftImageUrl(null);
+    imagePickTokenRef.current += 1;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setDraftImageError(null);
+    setDraftImageStatus("idle");
+    setDraftImageUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     setOverrideQuestion(null);
 
     if (flowIndex + 1 < currentFlow.length) {
@@ -390,7 +427,14 @@ const MyInterviews = () => {
     setSentMessages(allMessages);
 
     setDraftText("");
-    setDraftImageUrl(null);
+    imagePickTokenRef.current += 1;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setDraftImageUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setDraftImageError(null);
+    setDraftImageStatus("idle");
 
     const isLastCategory =
       CATEGORY_ORDER.indexOf(category) === CATEGORY_ORDER.length - 1;
@@ -430,10 +474,51 @@ const MyInterviews = () => {
   }
 
   function onPickImage(file: File | null) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) return;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
+    if (!file) {
+      setDraftImageError(null);
+      return;
+    }
+
+    const token = (imagePickTokenRef.current += 1);
+
+    // Replace any previously selected draft image.
+    setDraftImageUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setDraftImageError(null);
+    setDraftImageStatus("loading");
+
+    const type = (file.type || "").toLowerCase();
+    const looksLikeImage =
+      type.startsWith("image/") || IMAGE_EXT_RE.test(file.name || "");
+
+    if (!looksLikeImage) {
+      setDraftImageError("Only image files are allowed for attachments.");
+      setDraftImageStatus("idle");
+      return;
+    }
+
+    // Validate that the file actually decodes as an image (guards against renamed files).
     const url = URL.createObjectURL(file);
-    setDraftImageUrl(url);
+    const img = new Image();
+    img.onload = () => {
+      if (token !== imagePickTokenRef.current) {
+        URL.revokeObjectURL(url);
+        return;
+      }
+      setDraftImageUrl(url);
+      setDraftImageStatus("idle");
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      if (token !== imagePickTokenRef.current) return;
+      setDraftImageError("Selected file could not be read as an image.");
+      setDraftImageStatus("idle");
+    };
+    img.src = url;
   }
 
   function tourText(step: TourStep) {
@@ -456,10 +541,22 @@ const MyInterviews = () => {
                 <span>You</span>
                 <button
                   type="button"
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={startCamera}
+                  className={
+                    isCameraOn
+                      ? "btn btn-sm btn-secondary"
+                      : "btn btn-sm btn-primary"
+                  }
+                  onClick={() => {
+                    if (isCameraOn) {
+                      stopCamera();
+                      return;
+                    }
+                    void startCamera().catch(() => {
+                      // ignore (permission denied / no device)
+                    });
+                  }}
                 >
-                  Enable camera
+                  {isCameraOn ? "Disable camera" : "Enable camera"}
                 </button>
               </div>
 
@@ -496,7 +593,7 @@ const MyInterviews = () => {
 
                   <button
                     type="button"
-                    className="btn btn-sm btn-outline-secondary"
+                    className="btn btn-sm btn-secondary"
                     onClick={() => setManualTourOpen(true)}
                   >
                     Walkthrough
@@ -561,7 +658,6 @@ const MyInterviews = () => {
                       {sentMessages.map((m) => (
                         <div key={m.id} className="chat-innr right">
                           <div className="chat-self">
-                            <p>{m.text}</p>
                             {m.imageUrl && (
                               <div className="mt-2">
                                 <img
@@ -571,11 +667,12 @@ const MyInterviews = () => {
                                 />
                               </div>
                             )}
+                            <p>{m.text}</p>
                           </div>
                         </div>
                       ))}
 
-                      {(speech.isRecording || draftTranscript) && (
+                      {/* {(speech.isRecording || draftTranscript) && (
                         <div className="chat-innr right live-transcript">
                           <div className="chat-self">
                             <p>
@@ -589,7 +686,7 @@ const MyInterviews = () => {
                             </p>
                           </div>
                         </div>
-                      )}
+                      )} */ }
                     </>
                   )}
                 </div>
@@ -623,7 +720,7 @@ const MyInterviews = () => {
 
                     <button
                       type="button"
-                      className="btn btn-outline-secondary"
+                      className="btn btn-secondary"
                       onClick={replayQuestion}
                       disabled={
                         speech.isRecording ||
@@ -639,7 +736,7 @@ const MyInterviews = () => {
                     {showPickAnotherButton && (
                       <button
                         type="button"
-                        className="btn btn-outline-primary"
+                        className="btn btn-secondary"
                         onClick={openQuestionBank}
                         disabled={
                           speech.isRecording ||
@@ -656,7 +753,7 @@ const MyInterviews = () => {
 
                     <button
                       type="button"
-                      className="btn btn-outline-success"
+                      className="btn btn-primary"
                       onClick={nextQuestion}
                       disabled={
                         speech.isRecording ||
@@ -669,8 +766,33 @@ const MyInterviews = () => {
                     </button>
                   </div>
                 </div>
-
+                {draftImageUrl && (
+                    <div className="attachment-strip" aria-label="Attachments">
+                      <div className="attachment-chip">
+                        <img src={draftImageUrl} alt="attachment preview" />
+                        <button
+                          type="button"
+                          className="attachment-remove"
+                          onClick={() => {
+                            imagePickTokenRef.current += 1;
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                            setDraftImageUrl((prev) => {
+                              if (prev) URL.revokeObjectURL(prev);
+                              return null;
+                            });
+                            setDraftImageError(null);
+                            setDraftImageStatus("idle");
+                          }}
+                          aria-label="Remove image"
+                          title="Remove"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 <div className="send-msg">
+                  
                   <div className="send-msg-input">
                     <textarea
                       value={speech.isRecording ? speech.draftTranscript : draftText}
@@ -703,9 +825,11 @@ const MyInterviews = () => {
 
                   <button
                     type="button"
+                    className="send-btn"
                     onClick={sendDraft}
                     disabled={
                       !draftText.trim() ||
+                      draftImageStatus === "loading" ||
                       speech.isRecording ||
                       !interviewActive ||
                       isInterviewDone ||
@@ -716,6 +840,18 @@ const MyInterviews = () => {
                     <img src={sendicon} alt="" />
                   </button>
                 </div>
+
+                {draftImageError && (
+                  <div className="alert alert-warning mt-2 mb-0">
+                    {draftImageError}
+                  </div>
+                )}
+
+                {draftImageStatus === "loading" && !draftImageError && (
+                  <div className="text-muted mt-2" style={{ fontSize: 13 }}>
+                    Validating image...
+                  </div>
+                )}
 
                 {questionBankOpen && (
                   <div className="intro-modal">
@@ -825,7 +961,10 @@ const MyInterviews = () => {
                   type="file"
                   accept="image/*"
                   className="d-none"
-                  onChange={(e) => onPickImage(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    onPickImage(e.target.files?.[0] || null);
+                    e.currentTarget.value = "";
+                  }}
                 />
               </div>
             </div>
