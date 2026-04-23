@@ -1,39 +1,24 @@
-import { useEffect, useState } from "react";
 import BlogCard from "../../../components/BlogCard/BlogCard";
 import InnerBanner from "../../../components/InnerBanner/InnerBanner";
 import ReviewSection from "../../../components/Review/ReviewSection";
 import SubHeader from "../../../components/SubHeader/SubHeader";
-import { getBlogs } from "../../../services/apis/blog.api";
 import "./Blog.scss";
 import { useNavigate } from "react-router-dom";
+import useBlogs from "./useBlogs";
 
 const Blog = () => {
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const fetchBlogs = async (currentPage: number) => {
-    setLoading(true);
-    try {
-      const data = await getBlogs(currentPage, 6);
-      console.log(data);
-
-      // setBlogs(data.blogData.Blogs);
-      // setTotalPages(data.blogData.totalPages);
-      setBlogs(data.result.blogs);
-      setTotalPages(data.result.totalPages);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlogs(page);
-  }, [page]);
+  const {
+    filteredBlogs,
+    categoryOptions,
+    selectedCategories,
+    loading,
+    page,
+    totalPages,
+    setPage,
+    setSelectedCategories,
+    toggleCategory,
+  } = useBlogs();
 
   return (
     <>
@@ -48,22 +33,58 @@ const Blog = () => {
             />
           </div>
 
+          <div className="blog-filter-row">
+            <div className="blog-filter-card">
+              <div className="blog-filter-head">
+                <h4>Blog Categories</h4>
+                {!!selectedCategories.length && (
+                  <button
+                    type="button"
+                    className="blog-filter-clear"
+                    onClick={() => setSelectedCategories([])}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <div className="blog-filter-options">
+                {categoryOptions.map((category) => (
+                  <label key={category} className="blog-filter-option">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category)}
+                      onChange={() => toggleCategory(category)}
+                    />
+                    <span>{category}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="blog-wrapper">
             <div className="row g-4">
-              {blogs.map((blog, index) => (
+              {filteredBlogs.map((blog, index) => (
                 <div
                   className="col-lg-4 col-md-6"
                   key={blog._id || index}
                   onClick={() => navigate(`/blog/${blog.slug}`)}
                 >
                   <BlogCard
-                    image={blog.featuredImage}
-                    title={blog.title}
-                    desc={blog.excerpt}
+                    image={blog.featuredImage || ""}
+                    title={blog.title || ""}
+                    desc={blog.excerpt || ""}
                   />
                 </div>
               ))}
             </div>
+
+            {!loading && !filteredBlogs.length && (
+              <div className="blog-empty-state">
+                No blogs found for the selected category.
+              </div>
+            )}
 
             <div className="text-center mt-4">
               <button

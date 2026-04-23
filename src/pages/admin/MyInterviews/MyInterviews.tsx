@@ -8,7 +8,9 @@ import sendicon from "../../../assets/images/send-btn.svg";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 import type {
   InterviewCategory,
+  InterviewQuestion,
 } from "../../../services/apis/interview.api";
+import { getInterviewQuestions } from "../../../services/apis/interview.api";
 import { klingRenderByCategory } from "../../../services/apis/kling.api";
 import { CATEGORY_ORDER, mapKey } from "./myInterviews.constants";
 import { useCameraPreview } from "./useCameraPreview";
@@ -37,6 +39,19 @@ const MyInterviews = () => {
 
   const [category, setCategory] = useState<InterviewCategory>("childhood");
   const [flowIndex, setFlowIndex] = useState(0);
+  const [overrideQuestion, setOverrideQuestion] =
+    useState<InterviewQuestion | null>(null);
+
+  const [questionBankOpen, setQuestionBankOpen] = useState(false);
+  const [questionBankLoading, setQuestionBankLoading] = useState(false);
+  const [questionBankError, setQuestionBankError] = useState<string | null>(null);
+  const [questionBankSelectedId, setQuestionBankSelectedId] = useState("");
+  const [questionBankAvailable, setQuestionBankAvailable] = useState<
+    Partial<Record<InterviewCategory, boolean>>
+  >({});
+  const [questionBank, setQuestionBank] = useState<
+    Partial<Record<InterviewCategory, InterviewQuestion[]>>
+  >({});
 
   const {
     phase,
@@ -81,7 +96,7 @@ const MyInterviews = () => {
   const introFromEnv = (import.meta.env as Record<string, string | undefined>)
     .VITE_INTERVIEW_INTRO_URL;
   const introVideoUrl =
-    localIntroVideo || bookends[0]?.videoUrl || introFromEnv || null;
+    bookends[0]?.videoUrl || introFromEnv || localIntroVideo || null;
 
   const currentFlow = useMemo(() => {
     return questions[mapKey(category, "flow")] || [];
@@ -90,6 +105,10 @@ const MyInterviews = () => {
   const currentQuestion = useMemo(() => {
     return currentFlow[flowIndex] || null;
   }, [currentFlow, flowIndex]);
+
+  const activeQuestion = useMemo(() => {
+    return overrideQuestion || currentQuestion;
+  }, [overrideQuestion, currentQuestion]);
 
   const [tourRect, setTourRect] = useState<
     { top: number; left: number; width: number; height: number } | null
@@ -109,9 +128,9 @@ const MyInterviews = () => {
   useEffect(() => {
     if (!interviewActive) return;
     if (isLoading) return;
-    if (!avatarVideoRef.current || !currentQuestion?.videoUrl) return;
+    if (!avatarVideoRef.current || !activeQuestion?.videoUrl) return;
 
-    avatarVideoRef.current.src = currentQuestion.videoUrl;
+    avatarVideoRef.current.src = activeQuestion.videoUrl;
     avatarVideoRef.current
       .play()
       .then(() => {
@@ -123,7 +142,7 @@ const MyInterviews = () => {
         setAvatarPlayBlocked(true);
         setAvatarEnded(false);
       });
-  }, [interviewActive, isLoading, currentQuestion]);
+  }, [interviewActive, isLoading, activeQuestion]);
 
   useEffect(() => {
     if (!showIntro) return;
@@ -248,6 +267,7 @@ const MyInterviews = () => {
     setDraftText("");
     speech.reset();
     setDraftImageUrl(null);
+    setOverrideQuestion(null);
 
     if (flowIndex + 1 < currentFlow.length) {
       setFlowIndex((i) => i + 1);
@@ -262,6 +282,97 @@ const MyInterviews = () => {
     }
   }
 
+  const answeredQuestionIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const m of sentMessages) {
+      if (m.questionId) ids.add(m.questionId);
+    }
+    return ids;
+  }, [sentMessages]);
+
+  const bankQuestions = useMemo(() => {
+    return questionBank[category] || [];
+  }, [questionBank, category]);
+
+  const bankAvailable = useMemo(() => {
+    return bankQuestions.filter((q) => {
+      if (answeredQuestionIds.has(q._id)) return false;
+      if (q._id === currentQuestion?._id) return false;
+      return true;
+    });
+  }, [bankQuestions, answeredQuestionIds, currentQuestion?._id]);
+
+  const showPickAnotherButton = questionBankAvailable[category] === true;
+
+  useEffect(() => {
+    // Bookends do not have a database question set (only scripted flow videos).
+    if (category === "bookends") {
+      setQuestionBankAvailable((prev) => ({ ...prev, bookends: false }));
+      return;
+    }
+
+    // Don't refetch if we already know availability for this category.
+    if (questionBankAvailable[category] !== undefined) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const res = await getInterviewQuestions({ category, setType: "database" });
+        if (cancelled) return;
+        const list = res.result || [];
+        setQuestionBank((prev) => ({ ...prev, [category]: list }));
+        setQuestionBankAvailable((prev) => ({ ...prev, [category]: list.length > 0 }));
+      } catch {
+        if (cancelled) return;
+        setQuestionBankAvailable((prev) => ({ ...prev, [category]: false }));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [category, questionBankAvailable]);
+
+  async function openQuestionBank() {
+    setQuestionBankOpen(true);
+    setQuestionBankError(null);
+    setQuestionBankSelectedId("");
+
+    if (questionBank[category]?.length) return;
+
+    setQuestionBankLoading(true);
+    try {
+      const res = await getInterviewQuestions({ category, setType: "database" });
+      setQuestionBank((prev) => ({
+        ...prev,
+        [category]: res.result || [],
+      }));
+    } catch {
+      setQuestionBankError("Failed to load question bank.");
+    } finally {
+      setQuestionBankLoading(false);
+    }
+  }
+
+  function closeQuestionBank() {
+    setQuestionBankOpen(false);
+    setQuestionBankError(null);
+    setQuestionBankSelectedId("");
+  }
+
+  function applyQuestionBankSelection() {
+    const selected =
+      bankAvailable.find((q) => q._id === questionBankSelectedId) ||
+      bankQuestions.find((q) => q._id === questionBankSelectedId) ||
+      null;
+
+    if (!selected) return;
+
+    setOverrideQuestion(selected);
+    closeQuestionBank();
+  }
+
   function sendDraft() {
     const text = draftText.trim();
     if (!text) return;
@@ -272,7 +383,7 @@ const MyInterviews = () => {
       imageUrl: draftImageUrl,
       createdAt: Date.now(),
       category,
-      questionId: currentQuestion?._id || null,
+      questionId: activeQuestion?._id || null,
     };
 
     const allMessages = [...sentMessages, msg];
@@ -433,7 +544,7 @@ const MyInterviews = () => {
                       </div>
                     )}
                   </div>
-                  {!currentQuestion?.videoUrl && (
+                  {!activeQuestion?.videoUrl && (
                     <figure className="mb-0 placeholder-figure">
                       <img src={img2} alt="Avatar placeholder" />
                     </figure>
@@ -518,12 +629,30 @@ const MyInterviews = () => {
                         speech.isRecording ||
                         !interviewActive ||
                         isLoading ||
-                        !currentQuestion?.videoUrl
+                        !activeQuestion?.videoUrl
                       }
                       title="Replay the question video"
                     >
                       Replay question
                     </button>
+
+                    {showPickAnotherButton && (
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary"
+                        onClick={openQuestionBank}
+                        disabled={
+                          speech.isRecording ||
+                          !interviewActive ||
+                          isLoading ||
+                          isInterviewDone ||
+                          isRendering
+                        }
+                        title="Pick a different question from the question bank"
+                      >
+                        Pick another question
+                      </button>
+                    )}
 
                     <button
                       type="button"
@@ -587,6 +716,88 @@ const MyInterviews = () => {
                     <img src={sendicon} alt="" />
                   </button>
                 </div>
+
+                {questionBankOpen && (
+                  <div className="intro-modal">
+                    <div className="intro-card">
+                      <div className="d-flex align-items-center justify-content-between mb-2">
+                        <h5 className="mb-0">Pick another question</h5>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={closeQuestionBank}
+                        >
+                          Close
+                        </button>
+                      </div>
+
+                      {questionBankLoading ? (
+                        <div className="p-2 text-muted">Loading question bank…</div>
+                      ) : (
+                        <>
+                          {questionBankError ? (
+                            <div className="alert alert-warning mb-2">
+                              {questionBankError}
+                            </div>
+                          ) : null}
+
+                          {bankAvailable.length === 0 ? (
+                            <div className="alert alert-info mb-2">
+                              No available questions in the database set for this section.
+                            </div>
+                          ) : (
+                            <div className="mb-2">
+                              <label className="form-label">Database questions</label>
+                              <select
+                                className="form-select"
+                                value={questionBankSelectedId}
+                                onChange={(e) => setQuestionBankSelectedId(e.target.value)}
+                              >
+                                <option value="">Select</option>
+                                {bankAvailable.map((q) => (
+                                  <option key={q._id} value={q._id}>
+                                    {q.questionText.length > 90
+                                      ? `${q.questionText.slice(0, 90)}…`
+                                      : q.questionText}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          {questionBankSelectedId ? (
+                            <div className="mb-2">
+                              <div className="text-muted" style={{ fontSize: 13 }}>
+                                This will replace the current question for this step.
+                              </div>
+                            </div>
+                          ) : null}
+
+                          <div className="d-flex justify-content-end gap-2 mt-3">
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary"
+                              onClick={() => {
+                                setOverrideQuestion(null);
+                                closeQuestionBank();
+                              }}
+                            >
+                              Use scripted question
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={applyQuestionBankSelection}
+                              disabled={!questionBankSelectedId}
+                            >
+                              Use this question
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {(isInterviewDone || isRendering || renderTasks || renderError) && (
                   <div className="mt-3">

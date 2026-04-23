@@ -19,8 +19,8 @@ const Footer = () => {
           <div className="col-md-4">
             <h3 className="ft-hdr">Quick Links</h3>
             <ul className="ft-list">
-              <li><Link to="/">How It Works</Link></li>
-              <li><Link to="/">Features</Link></li>
+              <li><Link to="/#how-it-works">How It Works</Link></li>
+              <li><Link to="/#features">Features</Link></li>
               <li><Link to="/faq">FAQ’s</Link></li>
               <li><Link to="/blog">Blog</Link></li>
               <li><Link to="/contact">Help Center</Link></li>

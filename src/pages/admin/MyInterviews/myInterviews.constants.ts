@@ -4,6 +4,7 @@ export const CATEGORY_ORDER: InterviewCategory[] = [
   "childhood",
   "adulthood",
   "storyhighlight",
+  "bookends",
 ];
 
 export function mapKey(category: InterviewCategory, setType: "flow" | "database") {
@@ -14,4 +15,3 @@ export const SESSION_KEYS = {
   introSeen: "narrative_interview_intro_seen",
   tourDone: "narrative_interview_tour_done",
 } as const;
-
