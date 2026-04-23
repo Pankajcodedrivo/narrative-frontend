@@ -1,5 +1,5 @@
 import { Fancybox } from "@fancyapps/ui";
-import { useEffect } from "react";
+import { useState,useEffect } from "react";
 import banner from "../../../assets/images/banner.jpg";
 import banImg from "../../../assets/images/banner-img.jpg";
 import shape1 from "../../../assets/images/shape-1.png";
@@ -27,12 +27,59 @@ import BenefitCard from "../../../components/Home/BenefitsFeatures/BenefitCard";
 import FeatureCard from "../../../components/Home/Feature/FeatureCard";
 import StoryCard from "../../../components/Home/Story/StoryCard";
 import ReviewSection from "../../../components/Review/ReviewSection";
+import AccordionItem from "../../../components/AccordionItem/AccordionItem";
 
 const Home = () => {
   useEffect(() => {
     Fancybox.bind("[data-fancybox]", {});
       return () => Fancybox.destroy();
-    }, []);
+    },
+    
+    []);
+    const [visibleCount, setVisibleCount] = useState(6);
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const faqData = [
+      {
+        title: "What if I'm not sure how to answer an interview question?",
+        content: "You can skip any question and choose one that feels easier to answer. We also provide response tips and sample responses to help you get started with confidence."
+      },
+      {
+        title: "What operating systems are needed for video and sound?",
+        content: "Our platform works on most devices, including iOS, Android, Mac, and Windows. As long as you have a stable internet connection, you're good to go."
+      },
+      {
+        title: "Who owns the rights to the content after the video is complete?",
+        content: "You own your story and the film, always. We simply provide the tools to help you create and preserve it."
+      },
+      {
+        title: "How long does it take to make a video?",
+        content: "Most people complete their interviews in three sessions or less, but you can go at your own pace. You can always save your work and return when you're ready."
+      },
+      {
+        title: "How does the process work?",
+        content: "You'll create an account, answer some opening questions, then proceed to the guided interview. From there, we turn your responses into a beautifully edited film. When it's complete, you'll get an email from us with the film attached / a link to view the film"
+      },
+      {
+        title: "Is this suitable for memorials or tributes?",
+        content: "Yes, it's a meaningful way to honor and remember someone's. It's also perfect for sharing at celebrations like retirement, anniversaries, family reunions, and other milestone moments."
+      },
+      {
+        title: "Do I have to create an account to get started?",
+        content: "Yes, creating an account allows you to save your progress and access your project anytime. It only takes a few minutes to get started."
+      },
+      {
+        title: "Can I purchase this for someone else?",
+        content: "Absolutely, you can gift this experience to someone special. When you create an account, you'll have an option to invite a participant of your choice to complete the guided interview."
+      },
+      {
+        title: "Do I have to use the interview guided questions?",
+        content: "No—you’re always in the driver’s seat. We provide a carefully curated question set to inspire meaningful moments and keep things flowing, but you’re never required to use it. Think of them as a caring guide—not a script.  Feel free to skip questions or select alternative questions from our library of over 200 questions.  This experience is designed to honor your story, your way"
+      },
+      {
+        title: "I'm camera shy. Can I still create a film without being on camera?",
+        content: "You're welcome to record just your audio by not turning your camera on, if you prefer not to be on camera. We use creative visuals to bring your story to life without showing your face."
+      }
+  ];
   return (
     <>
       <section className="banner" style={{ backgroundImage: `url(${banner})` }}>
@@ -287,7 +334,8 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <section className="common-gap">
+
+      {/*<section className="common-gap">
         <div className="container">
           <div className="text-center">
             <SubHeader title="Immersive Audio experience & the final magic" desc="AI enhances your audio, selects the perfect background music, and applies the final touches that bring your story to life." />
@@ -316,7 +364,42 @@ const Home = () => {
             </StoryCard>
           </div>
         </div>
+      </section>  */}
+      <section className="common-gap">
+        <div className="container">
+          <div className="text-center">
+            <SubHeader title="FAQ’s" desc="Browse through commonly asked questions to find quick and helpful solutions." />
+          </div>
+          <div className="accordion">
+              {faqData.slice(0, visibleCount).map((item, index) => (
+                <AccordionItem
+                  key={index}
+                  title={item.title}
+                  isOpen={openIndex === index}
+                  onToggle={() =>
+                    setOpenIndex(openIndex === index ? null : index)
+                  }
+                >
+                  <p>{item.content}</p>
+                </AccordionItem>
+              ))}
+          </div>
+          <div className="load-more text-center mt-32">
+              <button
+               type="button" 
+               className="btn btn-primary"
+               onClick={() => {
+                  if (visibleCount >= 10) {
+                    setVisibleCount(6); // Load Less
+                  } else {
+                    setVisibleCount(prev => prev + 3); // Load More
+                  }
+                }}
+               >{visibleCount >= 10 ? "Load Less" : "Load More"}</button>
+          </div>
+        </div>
       </section>
+
       <ReviewSection />
     </>
   );
