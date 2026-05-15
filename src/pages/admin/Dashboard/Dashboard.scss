@@ -60,24 +60,46 @@
     }
 }
 .tips-box {
-    padding: 32px;
-    border-radius: 10px;
-    background: linear-gradient(180deg, rgba(243, 246, 229, 0.12) 0%, rgba(139, 141, 157, 0.12) 100%);
+    // padding: 32px;
+    // border-radius: 10px;
+    // background: linear-gradient(180deg, rgba(243, 246, 229, 0.12) 0%, rgba(139, 141, 157, 0.12) 100%);
+    // @media (max-width:991px) { 
+    //     padding: 20px;
+    // }
+    padding: 48px 0;
     @media (max-width:991px) { 
-        padding: 20px;
+        padding: 30px 0;
+    }
+    @media (max-width:767px) { 
+        padding: 15px 0 30px;
     }
     ul {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -8px -12px;
+        // display: flex;
+        // flex-wrap: wrap;
+        // margin: -8px -12px;
         li {
-            width: calc(100% / 2);
-            padding: 8px 12px;
-            @media (max-width:991px) { 
-                width: 100%;
+            // width: calc(100% / 2);
+            // padding: 8px 12px;
+            // @media (max-width:991px) { 
+            //     width: 100%;
+            // }
+            margin-bottom: 32px;    
+            position: relative;
+            padding-left: 25px;
+            &:after {
+                position: absolute;
+                content: '';
+                background: url('../../../assets/images/tick.png') no-repeat;
+                background-size: auto;
+                top: 2px;
+                left: 0;
+                width: 15px;
+                height: 15px;
+            }
+            &:last-child {
+                margin-bottom: 0;
             }
             h4 {
-                font-family: var(--glacial_indifferenceregular);
                 display: flex;
                 align-items: center;
                 margin-bottom: 8px;
@@ -89,6 +111,61 @@
             }
             p {
                 margin-bottom: 0;
+            }
+        }
+    }
+}
+.create-story {
+    background: rgba(225, 216, 204, 0.14);
+    padding: 32px;
+    border-radius: 10px;
+    text-align: center;
+    @media (max-width:767px) { 
+        padding: 20px;
+    }
+    ul {
+        width: max-content;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 32px;
+        @media (max-width:767px) { 
+            margin-bottom: 25px;
+        }
+        li {
+            margin-bottom: 24px;
+            @media (max-width:767px) { 
+                margin-bottom: 15px;
+            }
+            &:last-child {
+                margin-bottom: 0;
+            }
+            .checkbox-container {
+                font-size: 24px;
+                color: var(--color-a1);
+                @media (max-width:1199px) { 
+                    font-size: 18px;
+                }
+                @media (max-width:767px) { 
+                    font-size: 16px;
+                }
+                @media (max-width:360px) { 
+                    font-size: 14px;
+                }
+                input:checked ~ .checkmark {
+                    background-color: var(--color-primary);
+                }
+                .checkmark {
+                    border-radius: 100%;
+                    top: 6px;
+                    background: #3C3C432E;
+                    border-color: transparent;
+                    @media (max-width:1199px) { 
+                        top: 2px;
+                    }
+                    @media (max-width:360px) { 
+                        top: 1px;
+                    }
+                }
             }
         }
     }
