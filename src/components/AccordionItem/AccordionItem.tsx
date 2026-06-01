@@ -15,7 +15,7 @@ const AccordionItem = ({ title,
   return (
     <div className="accordion-item">
       <button  type="button"
-        className="accordion-header"
+        className={isOpen ? "accordion-header  open" : "accordion-header"}
         onClick={onToggle}
       >
         {title}

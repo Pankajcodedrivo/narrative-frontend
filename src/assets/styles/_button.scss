@@ -55,4 +55,10 @@
             color: var(--color-white);
         }
     }
+    &.start-btn {
+        background: #00C700;
+    }
+    &.stop-btn {
+        background: #C70000;
+    }
 }
