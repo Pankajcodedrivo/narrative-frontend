@@ -1,4 +1,22 @@
 .my-life-story {
+    &.my-life-story--processing {
+        .my-life-story-hdr {
+            .left-part {
+                h3::after {
+                    content: " In Progress";
+                    display: inline-block;
+                    margin-left: 10px;
+                    padding: 4px 10px;
+                    border-radius: 999px;
+                    background: rgba(59, 130, 246, 0.16);
+                    color: #1d4ed8;
+                    font-size: 12px;
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
     .my-life-story-hdr {
         display: flex;
         align-items: center;
@@ -23,6 +41,22 @@
                         font-family: var(--glacial_indifferencebold);
                     }
                 }
+            }
+        }
+    }
+}
+
+.collection-handoff-banner {
+    border-left: 4px solid #1d4ed8;
+}
+
+.table-responsive {
+    .table {
+        tbody {
+            tr.is-highlighted {
+                background: rgba(59, 130, 246, 0.08);
+                outline: 1px solid rgba(59, 130, 246, 0.3);
+                outline-offset: -1px;
             }
         }
     }

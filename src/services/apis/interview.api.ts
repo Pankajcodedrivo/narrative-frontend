@@ -15,7 +15,10 @@ export type InterviewQuestion = {
   order: number | null;
   questionText: string;
   videoUrl: string | null;
-  assetName: string | null;
+  videoKey?: string | null;
+  responseText?: string | null;
+  responseUrl?: string | null;
+  responseKey?: string | null;
   isActive: boolean;
 };
 

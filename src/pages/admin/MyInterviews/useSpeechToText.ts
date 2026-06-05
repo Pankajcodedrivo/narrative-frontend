@@ -9,6 +9,7 @@ export function useSpeechToText() {
   const speechLang = useMemo(() => navigator.language || "en-IN", []);
 
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,10 +28,14 @@ export function useSpeechToText() {
     setInterimTranscript("");
     finalTranscriptRef.current = "";
     interimTranscriptRef.current = "";
+    setIsPaused(false);
   }
 
-  async function start(): Promise<string | null> {
-    reset();
+  async function start({
+    resetTranscript = true,
+  }: { resetTranscript?: boolean } = {}): Promise<string | null> {
+    if (resetTranscript) reset();
+    else setError(null);
 
     const SpeechRecognitionCtor = getSpeechRecognitionCtor();
     if (!SpeechRecognitionCtor) {
@@ -112,6 +117,7 @@ export function useSpeechToText() {
 
     isRecordingRef.current = true;
     setIsRecording(true);
+    setIsPaused(false);
     try {
       recognition.start();
     } catch {
@@ -120,6 +126,33 @@ export function useSpeechToText() {
     }
 
     return null;
+  }
+
+  function pause() {
+    if (!isRecordingRef.current) return;
+    if (restartTimerRef.current) {
+      clearTimeout(restartTimerRef.current);
+      restartTimerRef.current = null;
+    }
+    recognitionRef.current?.stop?.();
+    recognitionRef.current = null;
+    isRecordingRef.current = false;
+    setIsRecording(false);
+    setIsPaused(true);
+    setInterimTranscript("");
+    interimTranscriptRef.current = "";
+  }
+
+  async function resume(): Promise<string | null> {
+    if (isRecordingRef.current) return null;
+    if (!finalTranscriptRef.current.trim() && !interimTranscriptRef.current.trim()) {
+      // If there's nothing captured yet, treat resume like a fresh start.
+      return start({ resetTranscript: true });
+    }
+    setIsPaused(false);
+    setInterimTranscript("");
+    interimTranscriptRef.current = "";
+    return start({ resetTranscript: false });
   }
 
   function stop() {
@@ -131,6 +164,9 @@ export function useSpeechToText() {
     recognitionRef.current = null;
     isRecordingRef.current = false;
     setIsRecording(false);
+    setIsPaused(false);
+    setInterimTranscript("");
+    interimTranscriptRef.current = "";
   }
 
   function cleanup() {
@@ -139,12 +175,15 @@ export function useSpeechToText() {
 
   return {
     isRecording,
+    isPaused,
     finalTranscript,
     interimTranscript,
     draftTranscript,
     error,
     reset,
     start,
+    pause,
+    resume,
     stop,
     cleanup,
     finalTranscriptRef,

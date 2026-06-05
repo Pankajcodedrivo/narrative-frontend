@@ -9,6 +9,7 @@ export type CollectionItem = {
   status: "processing" | "succeeded" | "failed" | string;
   videoUrl: string | null;
   error?: string | null;
+  renderPayload?: unknown;
   createdAt: string;
   updatedAt: string;
 };
@@ -23,3 +24,9 @@ export const refreshMyCollections = catchAsync(async (values?: { limit?: number 
   return res;
 });
 
+export const regenerateMyCollection = catchAsync(async (collectionId: string) => {
+  const res = await httpsCall.post(
+    `/profile/collections/${encodeURIComponent(collectionId)}/regenerate`,
+  );
+  return res;
+});
