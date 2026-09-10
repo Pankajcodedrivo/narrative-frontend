@@ -321,6 +321,23 @@
             object-fit: cover;
             aspect-ratio: 6 / 3.4;
         }
+        .user-avatar-placeholder {
+            width: 100%;
+            min-height: 220px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(243, 246, 229, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+            color: var(--color-primary);
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            aspect-ratio: 6 / 3.4;
+        }
+        .user-avatar-placeholder--large {
+            min-height: 220px;
+        }
     }
     .response-tip {
         background: linear-gradient(180deg, #F3F6E5 0%, #FFFFFF 100%);
@@ -330,6 +347,50 @@
         @media (max-width:991px) { 
             padding: 18px;
             min-height: auto;
+        }
+    }
+    .media-meter-card {
+        background: linear-gradient(180deg, #F3F6E5 0%, #FFFFFF 100%);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: stretch;
+        gap: 20px;
+        @media (max-width:991px) {
+            padding: 18px;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .user-img {
+            flex: 0 0 52%;
+            margin-bottom: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            align-self: stretch;
+            img,
+            .user-video {
+                width: 100%;
+                height: 100%;
+                display: block;
+                object-fit: cover;
+                aspect-ratio: 6 / 3.4;
+                border-radius: 12px;
+            }
+        }
+        .voice-meter {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 0;
+            padding: 8px 0;
+            p {
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+            .voice-meter-list {
+                margin-bottom: 0;
+            }
         }
     }
     .question-wrapper {
@@ -618,6 +679,19 @@
 }
 .interviews-left .placeholder-figure{
     position: absolute;
+}
+
+.interviews-left .user-avatar-placeholder {
+    width: 100%;
+    min-height: 320px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(243, 246, 229, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    color: var(--color-primary);
+    font-size: 80px;
+    font-weight: 700;
 }
  .attachment-strip {
         display: flex;

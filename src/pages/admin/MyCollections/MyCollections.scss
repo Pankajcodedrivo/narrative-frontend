@@ -1,81 +1,187 @@
 .my-life-story {
-    &.my-life-story--processing {
-        .my-life-story-hdr {
-            .left-part {
-                h3::after {
-                    content: " In Progress";
-                    display: inline-block;
-                    margin-left: 10px;
-                    padding: 4px 10px;
-                    border-radius: 999px;
-                    background: rgba(59, 130, 246, 0.16);
-                    color: #1d4ed8;
-                    font-size: 12px;
-                    vertical-align: middle;
-                }
-            }
-        }
-    }
-
+  &.my-life-story--failed {
     .my-life-story-hdr {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 32px;
-        @media (max-width:991px) { 
-            flex-direction: column;
-            margin-bottom: 24px;
-            text-align: center;
+      .left-part {
+        h3::after {
+          content: " Failed";
+          display: inline-block;
+          margin-left: 10px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(239, 68, 68, 0.12);
+          color: #dc2626;
+          font-size: 12px;
+          vertical-align: middle;
         }
-        .left-part {
-            ul {
-                display: flex;
-                gap: 16px;
-                flex-wrap: wrap;
-                @media (max-width:575px) { 
-                    justify-content: center;
-                }
-                li {
-                    span {
-                        font-family: var(--glacial_indifferencebold);
-                    }
-                }
-            }
-        }
+      }
     }
+  }
+
+  &.my-life-story--processing {
+    .my-life-story-hdr {
+      .left-part {
+        h3::after {
+          content: " In Progress";
+          display: inline-block;
+          margin-left: 10px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(59, 130, 246, 0.16);
+          color: #1d4ed8;
+          font-size: 12px;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  .my-life-story-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 32px;
+    @media (max-width: 991px) {
+      flex-direction: column;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .left-part {
+      ul {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        @media (max-width: 575px) {
+          justify-content: center;
+        }
+        li {
+          span {
+            font-family: var(--glacial_indifferencebold);
+          }
+        }
+      }
+    }
+  }
+}
+
+.collection-progress-panel {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(29, 78, 216, 0.08),
+    rgba(15, 23, 42, 0.03)
+  );
+  border: 1px solid rgba(29, 78, 216, 0.12);
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+  }
+
+  &__value {
+    margin-top: 6px;
+    font-size: 20px;
+    font-family: var(--glacial_indifferencebold);
+    color: #0f172a;
+  }
+
+  &__message {
+    margin: 8px 0 0;
+    color: #475569;
+  }
+
+  &__failed,
+  &__retry {
+    margin-top: 10px;
+    color: #334155;
+
+    span {
+      font-family: var(--glacial_indifferencebold);
+    }
+  }
 }
 
 .collection-handoff-banner {
-    border-left: 4px solid #1d4ed8;
+  border-left: 4px solid #1d4ed8;
+  background: linear-gradient(
+    135deg,
+    rgba(29, 78, 216, 0.08),
+    rgba(255, 255, 255, 0.8)
+  );
+}
+
+.collection-handoff-banner {
+  border-left: 4px solid #1d4ed8;
+}
+
+.collections-empty {
+  border: 1px solid rgba(29, 78, 216, 0.16);
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(29, 78, 216, 0.08),
+    rgba(225, 216, 204, 0.12)
+  );
+  padding: 32px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+
+  @media (max-width: 991px) {
+    padding: 24px;
+  }
+
+  &__content {
+    max-width: 680px;
+  }
+
+  &__eyebrow {
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+  }
+
+  h3 {
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: #64748b;
+  }
 }
 
 .table-responsive {
-    .table {
-        tbody {
-            tr.is-highlighted {
-                background: rgba(59, 130, 246, 0.08);
-                outline: 1px solid rgba(59, 130, 246, 0.3);
-                outline-offset: -1px;
-            }
-        }
+  .table {
+    tbody {
+      tr.is-highlighted {
+        background: rgba(59, 130, 246, 0.08);
+        outline: 1px solid rgba(59, 130, 246, 0.3);
+        outline-offset: -1px;
+      }
     }
+  }
 }
 .collections-video {
-    aspect-ratio: 12 / 4.8;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    &:hover {
-        .video-play-btn {
-            opacity: 1;
-        }
+  aspect-ratio: 12 / 4.8;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  &:hover {
+    .video-play-btn {
+      opacity: 1;
     }
-    video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+  }
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 .video-play-btn {
   position: absolute;
@@ -88,8 +194,8 @@
   height: 64px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.5); 
-  color: var(--color-secondary);    
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--color-secondary);
   font-size: 20px;
   cursor: pointer;
   z-index: 2;
@@ -97,25 +203,25 @@
   transition: all 0.5s;
 }
 .resume-btn-group {
-    display: flex;
-    gap: 16px;
+  display: flex;
+  gap: 16px;
 }
 .accordion.p-32 {
-    .accordion-item {
-        background: rgba(225, 216, 204, 0.14);
+  .accordion-item {
+    background: rgba(225, 216, 204, 0.14);
+  }
+  .accordion-header {
+    padding: 32px;
+    @media (max-width: 991px) {
+      padding: 20px;
     }
-    .accordion-header {
-        padding: 32px;
-        @media (max-width:991px) { 
-            padding: 20px;
-        }
+  }
+  .accordion-body {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    @media (max-width: 991px) {
+      padding-top: 20px;
+      padding-bottom: 20px;
     }
-    .accordion-body {
-        padding-top: 24px;
-        padding-bottom: 24px;
-        @media (max-width:991px) { 
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-    }
+  }
 }

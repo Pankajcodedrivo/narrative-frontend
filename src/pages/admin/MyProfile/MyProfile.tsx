@@ -7,9 +7,11 @@ import edit from "../../../assets/images/edit.svg";
 // import acc1 from "../../../assets/images/acc-open.svg";
 // import acc2 from "../../../assets/images/acc-close.svg";
 import { useProfile, SECTION_FIELDS } from "./useProfile";
+import { useLocation } from "react-router-dom";
 import "./MyProfile.scss";
 
 const MyProfile = () => {
+  const location = useLocation();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [validationTriggered, setValidationTriggered] = useState<{ [key: number]: boolean }>({});
   
@@ -25,6 +27,7 @@ const MyProfile = () => {
     handleSiblingDetailChange,
     handleSameAsEarlyChange,
     handleSameAsEarlyAdulthoodChange,
+    handleShareStoryChange,
     handleMomentSelect,
     handleProfileImageChange,
     handleImageChange,
@@ -37,7 +40,7 @@ const MyProfile = () => {
     profileImageUrl,
     referenceImages,
     musicGenres
-  } = useProfile();
+  } = useProfile((location.state as { redirectTo?: string } | null)?.redirectTo);
 
   // Get nested values safely with type assertion
   const earlyChildhood = getNestedValues.earlyChildhood(values) as any;
@@ -1220,7 +1223,7 @@ const MyProfile = () => {
                         className={`form-control ${getFieldError('shareStory', 3, validationTriggered) ? 'is-invalid' : ''}`}
                         name="shareStory"
                         value={values.shareStory || ''}
-                        onChange={handleChange}
+                        onChange={handleShareStoryChange}
                         onBlur={handleBlur}
                       >
                         <option value="">Select</option>
@@ -1512,21 +1515,6 @@ const MyProfile = () => {
             </AccordionItem>
           </div>
 
-        {/* ================= ALL USER UPLOADED IMAGES ================= */}
-          <div ref={sectionRefs[5]}>
-            <AccordionItem
-              title="User Uploaded Images"
-              isOpen={openIndex === 5}
-              onToggle={() => setOpenIndex(openIndex === 5 ? null : 5)}
-            >
-              <div className="profile-form">
-                <p>These are all user uploaded images which is uploaded by user during interview</p>
-                <div className="row">
-                    <h6>Coming Soon!</h6>
-                </div>
-              </div>
-            </AccordionItem>
-          </div>
         </div>
 
         <div className="text-center mt-4">

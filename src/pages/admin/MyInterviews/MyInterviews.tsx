@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
-import user from "../../../assets/images/user-big.png";
-import userImg from "../../../assets/images/user-img.jpg";
+import userImg from "../../../assets/images/user-big.png";
 import startIcon from "../../../assets/images/start-icon.svg";
 import pauseIcon from "../../../assets/images/pause-icon.svg";
 import resumeIcon from "../../../assets/images/resume-btn.svg";
@@ -13,16 +13,17 @@ import type {
   InterviewCategory,
   InterviewQuestion,
 } from "../../../services/apis/interview.api";
-import { getInterviewQuestions } from "../../../services/apis/interview.api";
 import {
-  type InterviewRenderAnswer,
-  renderInterviewVideo,
-  uploadInterviewImage,
-} from "../../../services/apis/shotstack.api";
+  completeInterview,
+  getInterviewQuestionCategories,
+  getInterviewQuestions,
+} from "../../../services/apis/interview.api";
+import { uploadInterviewImage } from "../../../services/apis/shotstack.api";
 import { CATEGORY_ORDER } from "./myInterviews.constants";
 import { useCameraPreview } from "./useCameraPreview";
 import { useInterviewQuestions } from "./useInterviewQuestions";
 import { useSpeechToText } from "./useSpeechToText";
+import type { RootState } from "../../../store/store";
 import "./MyInterviews.scss";
 
 type SentMessage = {
@@ -39,7 +40,14 @@ type SentMessage = {
 type RecordingStatus = "idle" | "recording" | "paused" | "stopped";
 type VoiceLevel = "low" | "medium" | "high" | null;
 type FinalRenderContext = {
-  answers: InterviewRenderAnswer[];
+  answers: Array<{
+    category: InterviewCategory;
+    questionId: string | null;
+    questionText?: string | null;
+    responseText?: string | null;
+    text: string;
+    imageUrl?: string | null;
+  }>;
   avatarImageUrl: string | null;
 };
 
@@ -48,20 +56,17 @@ function makeId() {
 }
 
 const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|bmp|svg)$/i;
-
-function getAvatarFallbackUrl() {
-  try {
-    return new URL(userImg, globalThis.location?.origin || "http://localhost").toString();
-  } catch {
-    return userImg;
-  }
-}
+const TEST_MODE = false; // set to true to auto-fill the draft with the sample response for testing
 
 const MyInterviews = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const user = useSelector((state: RootState) => state.authSlice.user);
+  const firstName = user?.firstName?.trim() || "User";
+  const profileImage = user?.profileimageurl?.trim() || "";
   const { isLoading, questions } = useInterviewQuestions();
 
-  const [category, setCategory] = useState<InterviewCategory>("childhood");
+  const [category, setCategory] = useState<InterviewCategory>("opening");
   const [flowIndex, setFlowIndex] = useState(0);
   const [overrideQuestion, setOverrideQuestion] =
     useState<InterviewQuestion | null>(null);
@@ -97,13 +102,21 @@ const MyInterviews = () => {
   const [questionBankError, setQuestionBankError] = useState<string | null>(
     null,
   );
+  const [questionBankSelectedCategory, setQuestionBankSelectedCategory] =
+    useState("");
   const [questionBankSelectedId, setQuestionBankSelectedId] = useState("");
   const [questionBankAvailable, setQuestionBankAvailable] = useState<
     Partial<Record<InterviewCategory, boolean>>
   >({});
-  const [questionBank, setQuestionBank] = useState<
-    Partial<Record<InterviewCategory, InterviewQuestion[]>>
+  const [questionBankCategories, setQuestionBankCategories] = useState<
+    Partial<Record<InterviewCategory, string[]>>
   >({});
+  const [questionBankQuestions, setQuestionBankQuestions] = useState<
+    InterviewQuestion[]
+  >([]);
+  const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
+  const [skipConfirmMessage, setSkipConfirmMessage] = useState("");
+  const profileToastShownRef = useRef(false);
 
   const userPanelRef = useRef<HTMLDivElement | null>(null);
   const avatarPanelRef = useRef<HTMLDivElement | null>(null);
@@ -125,6 +138,19 @@ const MyInterviews = () => {
   const voiceMeterSmoothedRef = useRef(0);
   const sampleResponseAudioRef = useRef<HTMLAudioElement | null>(null);
   const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.isProfileCompleted) return;
+    if (profileToastShownRef.current) return;
+
+    profileToastShownRef.current = true;
+    toast.error("Please complete your profile before starting the interview.");
+    navigate("/my-profile", {
+      replace: true,
+      state: { redirectTo: location.pathname },
+    });
+  }, [user, navigate, location.pathname]);
 
   const currentFlow = useMemo(() => {
     const key = `${category}:flow`;
@@ -173,6 +199,12 @@ const MyInterviews = () => {
       // autoplay may be blocked; user can press "Repeat Questions"
     });
   }, [interviewActive, isLoading, activeQuestion]);
+
+  useEffect(() => {
+    setQuestionBankSelectedCategory("");
+    setQuestionBankSelectedId("");
+    setQuestionBankQuestions([]);
+  }, [category]);
 
   useEffect(() => {
     stopCameraRef.current = stopCamera;
@@ -286,46 +318,45 @@ const MyInterviews = () => {
     return ids;
   }, [sentMessages]);
 
-  const bankQuestions = useMemo(() => {
-    return questionBank[category] || [];
-  }, [questionBank, category]);
-
   const bankAvailable = useMemo(() => {
-    return bankQuestions.filter((q) => {
+    return questionBankQuestions.filter((q) => {
       if (answeredQuestionIds.has(q._id)) return false;
       if (q._id === currentQuestion?._id) return false;
       return true;
     });
-  }, [bankQuestions, answeredQuestionIds, currentQuestion?._id]);
+  }, [questionBankQuestions, answeredQuestionIds, currentQuestion?._id]);
 
   const showPickAnotherButton = questionBankAvailable[category] === true;
 
   useEffect(() => {
-    if (category === "bookends") {
-      setQuestionBankAvailable((prev) => ({ ...prev, bookends: false }));
-      return;
-    }
-    if (questionBankAvailable[category] !== undefined) return;
+    if (questionBankCategories[category] !== undefined) return;
 
     let cancelled = false;
 
     void (async () => {
       try {
-        const res = await getInterviewQuestions({ category, setType: "database" });
+        const res = await getInterviewQuestionCategories({
+          category,
+          setType: "database",
+        });
         if (cancelled) return;
         const list = res.result || [];
-        setQuestionBank((prev) => ({ ...prev, [category]: list }));
-        setQuestionBankAvailable((prev) => ({ ...prev, [category]: list.length > 0 }));
+        setQuestionBankCategories((prev) => ({ ...prev, [category]: list }));
+        setQuestionBankAvailable((prev) => ({
+          ...prev,
+          [category]: list.length > 0,
+        }));
       } catch {
         if (cancelled) return;
         setQuestionBankAvailable((prev) => ({ ...prev, [category]: false }));
+        setQuestionBankCategories((prev) => ({ ...prev, [category]: [] }));
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [category, questionBankAvailable]);
+  }, [category, questionBankCategories]);
 
   async function startRecording() {
     if (!interviewActive) return;
@@ -417,6 +448,22 @@ const MyInterviews = () => {
     }
   }
 
+  function openSkipConfirm(message: string) {
+    setSkipConfirmMessage(message);
+    setSkipConfirmOpen(true);
+  }
+
+  function closeSkipConfirm() {
+    setSkipConfirmOpen(false);
+    setSkipConfirmMessage("");
+  }
+
+  async function retryCurrentResponse() {
+    closeSkipConfirm();
+    if (isInterviewDone || isRendering || isSubmittingAnswer) return;
+    await startRecording();
+  }
+
   function onPickImage(file: File | null) {
     if (fileInputRef.current) fileInputRef.current.value = "";
 
@@ -470,15 +517,26 @@ const MyInterviews = () => {
   function openQuestionBank() {
     setQuestionBankOpen(true);
     setQuestionBankError(null);
+    setQuestionBankSelectedCategory("");
     setQuestionBankSelectedId("");
-
-    if (questionBank[category]?.length) return;
+    setQuestionBankQuestions([]);
+    if (questionBankCategories[category]?.length) return;
 
     setQuestionBankLoading(true);
     void (async () => {
       try {
-        const res = await getInterviewQuestions({ category, setType: "database" });
-        setQuestionBank((prev) => ({ ...prev, [category]: res.result || [] }));
+        const res = await getInterviewQuestionCategories({
+          category,
+          setType: "database",
+        });
+        setQuestionBankCategories((prev) => ({
+          ...prev,
+          [category]: res.result || [],
+        }));
+        setQuestionBankAvailable((prev) => ({
+          ...prev,
+          [category]: (res.result || []).length > 0,
+        }));
       } catch {
         setQuestionBankError("Failed to load question bank.");
       } finally {
@@ -490,19 +548,48 @@ const MyInterviews = () => {
   function closeQuestionBank() {
     setQuestionBankOpen(false);
     setQuestionBankError(null);
+    setQuestionBankSelectedCategory("");
     setQuestionBankSelectedId("");
+    setQuestionBankQuestions([]);
   }
 
   function applyQuestionBankSelection() {
     const selected =
       bankAvailable.find((q) => q._id === questionBankSelectedId) ||
-      bankQuestions.find((q) => q._id === questionBankSelectedId) ||
+      questionBankQuestions.find((q) => q._id === questionBankSelectedId) ||
       null;
 
     if (!selected) return;
 
     setOverrideQuestion(selected);
     closeQuestionBank();
+  }
+
+  async function loadDatabaseQuestions(subCategory: string) {
+    if (!subCategory) {
+      setQuestionBankQuestions([]);
+      setQuestionBankSelectedId("");
+      return;
+    }
+
+    setQuestionBankLoading(true);
+    setQuestionBankError(null);
+    setQuestionBankSelectedId("");
+    try {
+      const res = await getInterviewQuestions({
+        category,
+        setType: "database",
+        subCategory,
+      });
+      setQuestionBankQuestions(res.result || []);
+    } catch {
+      setQuestionBankQuestions([]);
+      setQuestionBankError(
+        "Failed to load questions for the selected category.",
+      );
+    } finally {
+      setQuestionBankLoading(false);
+    }
   }
 
   function speakText(text: string) {
@@ -520,7 +607,9 @@ const MyInterviews = () => {
   }
 
   function playbackResponse() {
-    const text = (speech.isRecording ? speech.draftTranscript : draftText).trim();
+    const text = (
+      speech.isRecording ? speech.draftTranscript : draftText
+    ).trim();
     speakText(text);
   }
 
@@ -529,8 +618,7 @@ const MyInterviews = () => {
     const responseText = activeQuestion?.responseText?.trim() || "";
 
     if (responseUrl) {
-      const audio =
-        sampleResponseAudioRef.current || new Audio();
+      const audio = sampleResponseAudioRef.current || new Audio();
       sampleResponseAudioRef.current = audio;
 
       try {
@@ -552,7 +640,7 @@ const MyInterviews = () => {
     }
   }
 
-  function runFinalRender(context: FinalRenderContext) {
+  async function runFinalRender(context: FinalRenderContext) {
     if (isMountedRef.current) {
       setIsRendering(true);
       setRenderError(null);
@@ -560,30 +648,32 @@ const MyInterviews = () => {
       setRenderVideoUrl(null);
     }
 
-    void (async () => {
-      try {
-        const renderResponse = await renderInterviewVideo({
-          answers: context.answers,
-          avatarImageUrl: context.avatarImageUrl,
-        });
+    try {
+      const renderResponse = await completeInterview({
+        answers: context.answers,
+        options: {
+          sceneDurationSec: 30,
+        },
+      });
 
-        toast.success("Video rendering started in the background.");
-        if (isMountedRef.current) {
-          setRenderTasks({ interview: renderResponse.result.renderId });
-        }
-      } catch (error) {
-        toast.error(
+      toast.success("Video rendering started in the background.");
+      if (isMountedRef.current) {
+        setRenderTasks({ interview: renderResponse.result.collection._id });
+      }
+      return renderResponse;
+    } catch (error) {
+      toast.error((error as Error)?.message || "Failed to start rendering.");
+      if (isMountedRef.current) {
+        setRenderError(
           (error as Error)?.message || "Failed to start rendering.",
         );
-        if (isMountedRef.current) {
-          setRenderError((error as Error)?.message || "Failed to start rendering.");
-        }
-      } finally {
-        if (isMountedRef.current) {
-          setIsRendering(false);
-        }
       }
-    })();
+      throw error;
+    } finally {
+      if (isMountedRef.current) {
+        setIsRendering(false);
+      }
+    }
   }
 
   function retryFinalRender() {
@@ -621,8 +711,24 @@ const MyInterviews = () => {
   async function sendAnswer() {
     if (isSubmittingAnswer) return;
 
-    const text = (speech.isRecording ? speech.draftTranscript : draftText).trim();
-    if (!text) return;
+    const responseTip = activeQuestion?.responseText?.trim() || "";
+    const text = (
+      speech.isRecording ? speech.draftTranscript : draftText
+    ).trim();
+    const answerText = text || (TEST_MODE ? responseTip : "");
+
+    if (!answerText) {
+      openSkipConfirm(
+        speech.error
+          ? `An answer is required. ${speech.error} Please record a response and try again, or skip this question to continue.`
+          : "An answer is required. Please record a response and try again, or skip this question to continue.",
+      );
+      return;
+    }
+
+    if (!text && TEST_MODE && responseTip) {
+      setDraftText(responseTip);
+    }
 
     setIsSubmittingAnswer(true);
 
@@ -642,7 +748,7 @@ const MyInterviews = () => {
 
       const msg: SentMessage = {
         id: makeId(),
-        text,
+        text: answerText,
         imageUrl,
         createdAt: Date.now(),
         category,
@@ -661,29 +767,34 @@ const MyInterviews = () => {
       resetDraft({ keepText: false });
       setOverrideQuestion(null);
 
-        if (isLastCategory && isLastQuestion) {
-          setIsInterviewDone(true);
-          const avatarImageUrl = getAvatarFallbackUrl();
-          const finalContext = {
-            answers: allMessages.map((message) => ({
-              category: message.category,
-              questionId: message.questionId,
-              questionText: message.questionText,
-              responseText: message.responseText,
-              text: message.text,
-              imageUrl: message.imageUrl,
-            })),
-            avatarImageUrl,
-          };
-          setFinalRenderContext(finalContext);
-          navigate("/my-collections", {
-            replace: true,
-            state: { renderPending: true },
-          });
-          runFinalRender(finalContext);
+      if (isLastCategory && isLastQuestion) {
+        setIsInterviewDone(true);
+        const avatarImageUrl = profileImage || null;
+        const finalContext = {
+          answers: allMessages.map((message) => ({
+            category: message.category,
+            questionId: message.questionId,
+            questionText: message.questionText,
+            responseText: message.responseText,
+            text: message.text,
+            imageUrl: message.imageUrl,
+          })),
+          avatarImageUrl,
+        };
+        setFinalRenderContext(finalContext);
+        const renderStartError = await runFinalRender(finalContext).catch(
+          (error) => error as Error,
+        );
+        navigate("/my-collections", {
+          replace: true,
+          state: {
+            renderPending: true,
+            renderError: renderStartError?.message || undefined,
+          },
+        });
 
-          return;
-        }
+        return;
+      }
 
       if (flowIndex + 1 < currentFlow.length) {
         setFlowIndex((i) => i + 1);
@@ -701,6 +812,26 @@ const MyInterviews = () => {
     }
   }
 
+  function fillSampleResponseText() {
+    const sample = activeQuestion?.responseText?.trim() || "";
+    if (!sample) {
+      toast.error("No sample response is available for this question.");
+      return;
+    }
+
+    // TEST_MODE = true:
+    // Auto-fill the draft with the response tip so you can test the flow quickly.
+    // Set TEST_MODE = false to keep the draft empty and use the normal popup flow.
+    if (TEST_MODE) {
+      setDraftText(sample);
+    }
+
+    toast.success("Sample response added to the draft.");
+    if (recordingStatus === "idle" || recordingStatus === "paused") {
+      playSampleResponse();
+    }
+  }
+
   const headingText = useMemo(() => {
     if (recordingStatus === "recording") return "Recording Started";
     if (recordingStatus === "paused") return "Recording Paused";
@@ -713,10 +844,17 @@ const MyInterviews = () => {
       recordingStatus === "recording" ? speech.draftTranscript : draftText
     ).trim();
     if (txt) return txt;
-    const lastAnswer = sentMessages[sentMessages.length - 1]?.text?.trim() || "";
+    const lastAnswer =
+      sentMessages[sentMessages.length - 1]?.text?.trim() || "";
     if (isInterviewDone && lastAnswer) return lastAnswer;
     return "A. (Your answer will appear here…)";
-  }, [recordingStatus, speech.draftTranscript, draftText, sentMessages, isInterviewDone]);
+  }, [
+    recordingStatus,
+    speech.draftTranscript,
+    draftText,
+    sentMessages,
+    isInterviewDone,
+  ]);
 
   const currentDraft =
     recordingStatus === "recording" ? speech.draftTranscript : draftText;
@@ -724,78 +862,86 @@ const MyInterviews = () => {
 
   return (
     <>
-      <WelcomeHeader desc='Interview (voice to text).' />
+      <WelcomeHeader name={firstName} desc="Interview (voice to text)." />
 
-      <div className='interviews-box'>
-        <div className='row'>
-          <div className='col-lg-6'>
-            <p className='mb-4 text-center'>{headingText}</p>
+      <div className="interviews-box">
+        <div className="row">
+          <div className="col-lg-6">
+            <p className="mb-4 text-center">{headingText}</p>
           </div>
         </div>
 
-        <div className='row'>
-          <div className='col-lg-6'>
-            <div className='interviews-left' ref={userPanelRef}>
+        <div className="row">
+          <div className="col-lg-6">
+            <div className="interviews-left" ref={userPanelRef}>
               <div>
-                <div className='recording-top'>
-                  <h6 className='int-status'>
+                <div className="recording-top">
+                  <h6 className="int-status">
                     <span className={speech.isRecording ? "active" : ""}></span>{" "}
                     Live
                   </h6>
-                  <div className='recording-icon'>
+                  <div className="recording-icon">
                     <span></span>
                   </div>
                 </div>
 
-                <figure className='user-img'>
-                  <video
-                    ref={userVideoRef}
-                    className='user-video'
-                    autoPlay
-                    muted
-                    playsInline
-                    style={{ display: isCameraOn ? "block" : "none" }}
-                  />
-                  {!isCameraOn ? <img src={user} alt='' /> : null}
-                </figure>
+                <div className="media-meter-card mb-4">
+                  <figure className="user-img">
+                    <video
+                      ref={userVideoRef}
+                      className="user-video"
+                      autoPlay
+                      muted
+                      playsInline
+                      style={{ display: isCameraOn ? "block" : "none" }}
+                    />
+                    {!isCameraOn ? (
+                      profileImage ? (
+                        <img src={profileImage} alt={firstName} />
+                      ) : (
+                        <img src={userImg} alt={firstName} />
+                      )
+                    ) : null}
+                  </figure>
 
-                <div className='voice-meter mb-4'>
-                  <p>Voice Meter</p>
-                  <ul className='voice-meter-list'>
-                    <li
-                      className={`color-red ${voiceLevel === "high" ? "active" : ""}`}
-                    >
-                      High
-                    </li>
-                    <li
-                      className={`color-green ${
-                        voiceLevel === "medium" ? "active" : ""
-                      }`}
-                    >
-                      Perfect
-                    </li>
-                    <li
-                      className={`color-blue ${voiceLevel === "low" ? "active" : ""}`}
-                    >
-                      Low
-                    </li>
-                  </ul>
+                  <div className="voice-meter">
+                    <p>Voice Meter</p>
+                    <ul className="voice-meter-list">
+                      <li
+                        className={`color-red ${voiceLevel === "high" ? "active" : ""}`}
+                      >
+                        High
+                      </li>
+                      <li
+                        className={`color-green ${
+                          voiceLevel === "medium" ? "active" : ""
+                        }`}
+                      >
+                        Perfect
+                      </li>
+                      <li
+                        className={`color-blue ${voiceLevel === "low" ? "active" : ""}`}
+                      >
+                        Low
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
-              <p className='response-txt'>
+              <p className="response-txt">
                 If you&apos;d like, feel free to upload an image that goes along
                 with your response
               </p>
 
-              <div className='bottom-btn-wrapper' ref={controlsRef}>
-                <div className='left-content'>
-                  <span className='camara-icon'>
-                    <img src={camaraIcon} alt='' />
+              <div className="bottom-btn-wrapper" ref={controlsRef}>
+                <div className="left-content">
+                  <span className="camara-icon">
+                    <img src={camaraIcon} alt="" />
                   </span>
-                  <label className='switch'>
+                  <label className="switch">
                     <input
-                      type='checkbox'
+                      type="checkbox"
                       checked={isCameraOn}
                       onChange={() => {
                         if (isCameraOn) {
@@ -807,16 +953,16 @@ const MyInterviews = () => {
                         });
                       }}
                     />
-                    <span className='slider'></span>
+                    <span className="slider"></span>
                   </label>
                 </div>
 
-                <div className='right-content'>
+                <div className="right-content">
                   {recordingStatus === "idle" ? (
                     <>
                       <button
-                        type='button'
-                        className='btn btn-primary start-btn'
+                        type="button"
+                        className="btn btn-primary start-btn"
                         onClick={() => void startRecording()}
                         disabled={
                           !interviewActive ||
@@ -827,21 +973,21 @@ const MyInterviews = () => {
                         }
                       >
                         <span>
-                          <img src={startIcon} alt='' />
+                          <img src={startIcon} alt="" />
                         </span>
                         Start Recording
                       </button>
 
                       <button
-                        type='button'
-                        className='btn btn-primary'
+                        type="button"
+                        className="btn btn-primary"
                         onClick={replayQuestion}
                         disabled={
                           !activeQuestion?.videoUrl ||
                           isLoading ||
                           isSubmittingAnswer
                         }
-                        title='Replay question video'
+                        title="Replay question video"
                       >
                         Repeat Questions
                       </button>
@@ -851,22 +997,22 @@ const MyInterviews = () => {
                   {recordingStatus === "recording" ? (
                     <>
                       <button
-                        type='button'
-                        className='btn btn-danger start-btn'
+                        type="button"
+                        className="btn btn-danger start-btn"
                         onClick={stopRecording}
                       >
                         <span>
-                          <img src={stopIcon} alt='' />
+                          <img src={stopIcon} alt="" />
                         </span>
                         Stop Recording
                       </button>
                       <button
-                        type='button'
-                        className='btn btn-primary'
+                        type="button"
+                        className="btn btn-primary"
                         onClick={pauseRecording}
                       >
                         <span>
-                          <img src={pauseIcon} alt='' />
+                          <img src={pauseIcon} alt="" />
                         </span>
                         Pause Recording
                       </button>
@@ -875,8 +1021,8 @@ const MyInterviews = () => {
 
                   {recordingStatus === "paused" ? (
                     <button
-                      type='button'
-                      className='btn btn-primary'
+                      type="button"
+                      className="btn btn-primary"
                       onClick={() => void resumeRecording()}
                       disabled={
                         !interviewActive ||
@@ -886,7 +1032,7 @@ const MyInterviews = () => {
                       }
                     >
                       <span>
-                        <img src={resumeIcon} alt='' />
+                        <img src={resumeIcon} alt="" />
                       </span>
                       Resume Recording
                     </button>
@@ -895,11 +1041,10 @@ const MyInterviews = () => {
                   {recordingStatus === "stopped" ? (
                     <>
                       <button
-                        type='button'
-                        className='btn btn-primary start-btn'
+                        type="button"
+                        className="btn btn-primary start-btn"
                         onClick={() => void sendAnswer()}
                         disabled={
-                          !currentDraft.trim() ||
                           draftImageStatus === "loading" ||
                           !interviewActive ||
                           isInterviewDone ||
@@ -910,8 +1055,8 @@ const MyInterviews = () => {
                         Next Question
                       </button>
                       <button
-                        type='button'
-                        className='btn btn-primary'
+                        type="button"
+                        className="btn btn-primary"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={
                           !interviewActive ||
@@ -929,48 +1074,56 @@ const MyInterviews = () => {
             </div>
           </div>
 
-          <div className='col-lg-6'>
-            <div className='interviews-right' ref={avatarPanelRef}>
-              <div className='image-wrapper mb-4'>
+          <div className="col-lg-6">
+            <div className="interviews-right" ref={avatarPanelRef}>
+              <div className="image-wrapper mb-4">
                 <video
                   ref={avatarVideoRef}
-                  className='avatar-video'
+                  className="avatar-video"
                   playsInline
-                  style={{ display: activeQuestion?.videoUrl ? "block" : "none" }}
+                  style={{
+                    display: activeQuestion?.videoUrl ? "block" : "none",
+                  }}
                 />
-                {!activeQuestion?.videoUrl ? <img src={userImg} alt='' /> : null}
+                {!activeQuestion?.videoUrl ? (
+                  profileImage ? (
+                    <img src={profileImage} alt={firstName} />
+                  ) : (
+                    <img src={userImg} alt={firstName} />
+                  )
+                ) : null}
               </div>
 
-              <div className='response-tip mb-3' ref={transcriptRef}>
-                <div className='mb-4'>
-                  <div className='d-flex justify-content-between align-items-start gap-2'>
+              <div className="response-tip mb-3" ref={transcriptRef}>
+                <div className="mb-4">
+                  <div className="d-flex justify-content-between align-items-start gap-2">
                     <div>
-                      <h3 className='mb-1'>Response Tip:</h3>
-                      <div className='small text-muted'>
+                      <h3 className="mb-1">Response Tip:</h3>
+                      <div className="small text-muted">
                         {category.toUpperCase()} • {sectionProgress.index}/
                         {sectionProgress.total || 0}
                       </div>
                     </div>
                   </div>
-                  <p className='mt-2'>
+                  <p className="mt-2">
                     {activeQuestion?.responseText ||
                       "As you answer, try to give your audience a picture of what you were like day to day. You might share a few words people used to describe you, and a simple example that shows those traits in action."}
                   </p>
                 </div>
 
-                <div className='question-wrapper'>
-                  <div className='content-left'>
+                <div className="question-wrapper">
+                  <div className="content-left">
                     <p>
                       Q.{" "}
                       {activeQuestion?.questionText ||
                         "Loading interview question…"}
                     </p>
                   </div>
-                  <div className='content-right'>
+                  <div className="content-right">
                     <p>{answerPreview}</p>
                   </div>
                 </div>
-                      {/*
+                {/*
                 {sentMessages.length > 0 ? (
                   <div className='mt-2'>
                     {sentMessages.slice(-3).map((m) => (
@@ -984,65 +1137,69 @@ const MyInterviews = () => {
                 ) : null}
               */}
 
-              <input
-                ref={fileInputRef}
-                type='file'
-                accept='image/*'
-                style={{ display: "none" }}
-                onChange={(e) => onPickImage(e.target.files?.[0] || null)}
-              />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => onPickImage(e.target.files?.[0] || null)}
+                />
 
-              {draftImageUrl ? (
-                <div
-                  className='attachment-strip attachment-strip--right'
-                  aria-label='Attachments'
-                >
-                  <div className='attachment-chip'>
-                    <img src={draftImageUrl} alt='attachment preview' />
-                    <button
-                      type='button'
-                      className='attachment-remove'
-                      onClick={() => {
-                        imagePickTokenRef.current += 1;
-                        if (fileInputRef.current) fileInputRef.current.value = "";
-                        setDraftImageUrl((prev) => {
-                          if (prev) URL.revokeObjectURL(prev);
-                          return null;
-                        });
-                        setDraftImageFile(null);
-                        setDraftImageError(null);
-                        setDraftImageStatus("idle");
-                      }}
-                      aria-label='Remove image'
-                      title='Remove'
-                    >
-                      ×
-                    </button>
+                {draftImageUrl ? (
+                  <div
+                    className="attachment-strip attachment-strip--right"
+                    aria-label="Attachments"
+                  >
+                    <div className="attachment-chip">
+                      <img src={draftImageUrl} alt="attachment preview" />
+                      <button
+                        type="button"
+                        className="attachment-remove"
+                        onClick={() => {
+                          imagePickTokenRef.current += 1;
+                          if (fileInputRef.current)
+                            fileInputRef.current.value = "";
+                          setDraftImageUrl((prev) => {
+                            if (prev) URL.revokeObjectURL(prev);
+                            return null;
+                          });
+                          setDraftImageFile(null);
+                          setDraftImageError(null);
+                          setDraftImageStatus("idle");
+                        }}
+                        aria-label="Remove image"
+                        title="Remove"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
 
-              {draftImageError ? (
-                <div className='alert alert-warning mt-2 mb-0'>
-                  {draftImageError}
-                </div>
-              ) : null}
+                {draftImageError ? (
+                  <div className="alert alert-warning mt-2 mb-0">
+                    {draftImageError}
+                  </div>
+                ) : null}
 
-              {draftImageStatus === "loading" && !draftImageError ? (
-                <div className='text-muted mt-2' style={{ fontSize: 13 }}>
-                  Validating image...
-                </div>
-              ) : null}
+                {draftImageStatus === "loading" && !draftImageError ? (
+                  <div className="text-muted mt-2" style={{ fontSize: 13 }}>
+                    Validating image...
+                  </div>
+                ) : null}
+                {speech.error ? (
+                  <div className="alert alert-warning mt-2 mb-0">
+                    {speech.error}
+                  </div>
+                ) : null}
               </div>
               {recordingStatus === "idle" || recordingStatus === "paused" ? (
-                <div className='btn-wrapper'>
+                <div className="btn-wrapper">
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={() => {
-                      //const sample = activeQuestion?.responseText || "";
-                     // setDraftText(sample);
-                      playSampleResponse();
+                      fillSampleResponseText();
                     }}
                     disabled={
                       !interviewActive ||
@@ -1054,8 +1211,8 @@ const MyInterviews = () => {
                     Sample Response
                   </button>
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={openQuestionBank}
                     disabled={
                       !showPickAnotherButton ||
@@ -1069,9 +1226,9 @@ const MyInterviews = () => {
                     Select a Different Question
                   </button>
                   <button
-                    type='button'
-                    className='btn btn-primary'
-                    onClick={nextQuestion}
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => void sendAnswer()}
                     disabled={
                       !interviewActive ||
                       isInterviewDone ||
@@ -1085,18 +1242,18 @@ const MyInterviews = () => {
               ) : null}
 
               {recordingStatus === "stopped" ? (
-                <div className='btn-wrapper'>
+                <div className="btn-wrapper">
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={playbackResponse}
                     disabled={!currentDraft.trim()}
                   >
                     Playback Response
                   </button>
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={() => resetDraft({ keepText: false })}
                     disabled={
                       !interviewActive ||
@@ -1108,8 +1265,8 @@ const MyInterviews = () => {
                     Retry Response
                   </button>
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={() => setInviteOpen(true)}
                     disabled={
                       !interviewActive ||
@@ -1123,21 +1280,21 @@ const MyInterviews = () => {
                 </div>
               ) : null}
 
-              {(isInterviewDone || isRendering || renderTasks || renderError) ? (
-                <div className='mt-3'>
+              {isInterviewDone || isRendering || renderTasks || renderError ? (
+                <div className="mt-3">
                   {isRendering ? (
-                    <div className='alert alert-info mb-0'>
+                    <div className="alert alert-info mb-0">
                       Starting rendering…
                     </div>
                   ) : null}
                   {renderError ? (
-                    <div className='alert alert-warning mb-0'>
-                      <div className='d-flex flex-wrap align-items-center justify-content-between gap-2'>
+                    <div className="alert alert-warning mb-0">
+                      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <span>{renderError}</span>
                         {finalRenderContext ? (
                           <button
-                            type='button'
-                            className='btn btn-sm btn-outline-dark'
+                            type="button"
+                            className="btn btn-sm btn-outline-dark"
                             onClick={() => void retryFinalRender()}
                             disabled={isRendering || isSubmittingAnswer}
                           >
@@ -1148,14 +1305,14 @@ const MyInterviews = () => {
                     </div>
                   ) : null}
                   {renderTasks ? (
-                    <div className='alert alert-success mb-0'>
+                    <div className="alert alert-success mb-0">
                       Shotstack render queued: {Object.keys(renderTasks).length}
                     </div>
                   ) : null}
                   {renderVideoUrl ? (
-                    <div className='alert alert-success mb-0 mt-2'>
+                    <div className="alert alert-success mb-0 mt-2">
                       Video ready:{" "}
-                      <a href={renderVideoUrl} target='_blank' rel='noreferrer'>
+                      <a href={renderVideoUrl} target="_blank" rel="noreferrer">
                         Open video
                       </a>
                     </div>
@@ -1168,13 +1325,13 @@ const MyInterviews = () => {
       </div>
 
       {questionBankOpen ? (
-        <div className='intro-modal'>
-          <div className='intro-card'>
-            <div className='d-flex align-items-center justify-content-between mb-2'>
-              <h5 className='mb-0'>Pick another question</h5>
+        <div className="intro-modal">
+          <div className="intro-card">
+            <div className="d-flex align-items-center justify-content-between mb-2">
+              <h5 className="mb-0">Pick another question</h5>
               <button
-                type='button'
-                className='btn btn-sm btn-outline-secondary'
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
                 onClick={closeQuestionBank}
               >
                 Close
@@ -1182,43 +1339,74 @@ const MyInterviews = () => {
             </div>
 
             {questionBankLoading ? (
-              <div className='p-2 text-muted'>Loading question bank…</div>
+              <div className="p-2 text-muted">Loading question bank…</div>
             ) : (
               <>
                 {questionBankError ? (
-                  <div className='alert alert-warning mb-2'>
+                  <div className="alert alert-warning mb-2">
                     {questionBankError}
                   </div>
                 ) : null}
 
-                {bankAvailable.length === 0 ? (
-                  <div className='alert alert-info mb-2'>
-                    No available questions in the database set for this section.
+                {(questionBankCategories[category] || []).length === 0 ? (
+                  <div className="alert alert-info mb-2">
+                    No database question categories are available for this
+                    section.
                   </div>
                 ) : (
-                  <div className='mb-2'>
-                    <label className='form-label'>Database questions</label>
-                    <select
-                      className='form-select'
-                      value={questionBankSelectedId}
-                      onChange={(e) => setQuestionBankSelectedId(e.target.value)}
-                    >
-                      <option value=''>Select</option>
-                      {bankAvailable.map((q) => (
-                        <option key={q._id} value={q._id}>
-                          {q.questionText.length > 90
-                            ? `${q.questionText.slice(0, 90)}…`
-                            : q.questionText}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <>
+                    <div className="mb-2">
+                      <label className="form-label">Database category</label>
+                      <select
+                        className="form-select"
+                        value={questionBankSelectedCategory}
+                        onChange={(e) => {
+                          const nextCategory = e.target.value;
+                          setQuestionBankSelectedCategory(nextCategory);
+                          void loadDatabaseQuestions(nextCategory);
+                        }}
+                      >
+                        <option value="">Select</option>
+                        {(questionBankCategories[category] || []).map(
+                          (item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </div>
+
+                    <div className="mb-2">
+                      <label className="form-label">Database questions</label>
+                      <select
+                        className="form-select"
+                        value={questionBankSelectedId}
+                        onChange={(e) =>
+                          setQuestionBankSelectedId(e.target.value)
+                        }
+                        disabled={
+                          !questionBankSelectedCategory ||
+                          bankAvailable.length === 0
+                        }
+                      >
+                        <option value="">Select</option>
+                        {bankAvailable.map((q) => (
+                          <option key={q._id} value={q._id}>
+                            {q.questionText.length > 90
+                              ? `${q.questionText.slice(0, 90)}…`
+                              : q.questionText}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
                 )}
 
-                <div className='d-flex justify-content-end gap-2 mt-3'>
+                <div className="d-flex justify-content-end gap-2 mt-3">
                   <button
-                    type='button'
-                    className='btn btn-outline-secondary'
+                    type="button"
+                    className="btn btn-outline-secondary"
                     onClick={() => {
                       setOverrideQuestion(null);
                       closeQuestionBank();
@@ -1227,8 +1415,8 @@ const MyInterviews = () => {
                     Use scripted question
                   </button>
                   <button
-                    type='button'
-                    className='btn btn-primary'
+                    type="button"
+                    className="btn btn-primary"
                     onClick={applyQuestionBankSelection}
                     disabled={!questionBankSelectedId}
                   >
@@ -1241,34 +1429,67 @@ const MyInterviews = () => {
         </div>
       ) : null}
 
-      {inviteOpen ? (
-        <div className='intro-modal'>
-          <div className='intro-card'>
-            <div className='d-flex align-items-center justify-content-between mb-2'>
-              <h5 className='mb-0'>Invite Guest</h5>
+      {skipConfirmOpen ? (
+        <div className="intro-modal" role="dialog" aria-modal="true">
+          <div className="intro-card">
+            <h5 className="mb-2">Answer required</h5>
+            <p className="mb-4">{skipConfirmMessage}</p>
+            <div className="d-flex justify-content-end gap-2">
               <button
-                type='button'
-                className='btn btn-sm btn-outline-secondary'
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => void retryCurrentResponse()}
+              >
+                Retry recording
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  closeSkipConfirm();
+                  // POPUP FLOW:
+                  // Keep this call active when you want the popup "Skip this question"
+                  // action to move to the next question.
+                  // If you do NOT want the popup flow, replace this with retryCurrentResponse()
+                  // or closeSkipConfirm() only.
+                  nextQuestion();
+                }}
+              >
+                Skip this question
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {inviteOpen ? (
+        <div className="intro-modal">
+          <div className="intro-card">
+            <div className="d-flex align-items-center justify-content-between mb-2">
+              <h5 className="mb-0">Invite Guest</h5>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
                 onClick={() => setInviteOpen(false)}
               >
                 Close
               </button>
             </div>
 
-            <div className='mb-2 text-muted' style={{ fontSize: 13 }}>
+            <div className="mb-2 text-muted" style={{ fontSize: 13 }}>
               Share this link with your guest:
             </div>
 
-            <div className='d-flex gap-2 flex-wrap align-items-center'>
+            <div className="d-flex gap-2 flex-wrap align-items-center">
               <input
-                className='form-control'
+                className="form-control"
                 value={inviteLink}
                 readOnly
                 style={{ flex: "1 1 320px" }}
               />
               <button
-                type='button'
-                className='btn btn-primary'
+                type="button"
+                className="btn btn-primary"
                 onClick={() => void copyInviteLink(inviteLink)}
                 disabled={!inviteLink}
               >

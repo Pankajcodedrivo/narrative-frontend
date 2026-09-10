@@ -1,12 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
+import profileImg from "../../assets/images/profile-lg.png";
 import notificationIcon from "../../assets/images/notification.svg";
-import user from "../../assets/images/avtar.png";
 import tick from "../../assets/images/tick.png";
 import menu from "../../assets/images/menu.png";
 
 import { logOut } from "../../store/auth.store";
+import { getMyNotifications } from "../../services/apis/notification.api";
+import socketService from "../../services/socketService";
+import type { RootState } from "../../store/store";
 
 import "./DashboardHeader.scss";
 
@@ -17,6 +21,56 @@ interface DashboardHeaderProps {
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ toggleMenu }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.authSlice.user);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const firstName = user?.firstName?.trim() || "User";
+  const profileImage = user?.profileimageurl?.trim() || "";
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      try {
+        const res = await getMyNotifications();
+        if (!mounted) return;
+        setUnreadCount(Number(res?.unreadCount || 0));
+      } catch {
+        if (mounted) setUnreadCount(0);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    socketService.connect(user._id);
+
+    const handleNotificationCreated = ({
+      unreadCount: nextUnreadCount,
+    }: {
+      unreadCount: number;
+    }) => {
+      setUnreadCount(nextUnreadCount);
+    };
+
+    const handleNotificationUpdated = ({
+      unreadCount: nextUnreadCount,
+    }: {
+      unreadCount: number;
+    }) => {
+      setUnreadCount(nextUnreadCount);
+    };
+
+    socketService.onNotificationCreated(handleNotificationCreated);
+    socketService.onNotificationUpdated(handleNotificationUpdated);
+
+    return () => {
+      socketService.offNotificationCreated();
+      socketService.offNotificationUpdated();
+    };
+  }, [user?._id]);
 
   const logoutHandler = () => {
     dispatch(logOut());
@@ -36,16 +90,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ toggleMenu }) => {
       <div className="notification-icon">
         <Link to="/notification-list">
           <img src={notificationIcon} alt="notification" />
+          {unreadCount > 0 ? <span className="notification-badge">{unreadCount}</span> : null}
         </Link>
       </div>
 
       {/* User Dropdown */}
       <div className="user dropdown">
         <button type="button" className="dropdown-toggle">
-          <span>
-            <img src={user} alt="user" />
+          <span className="user-avatar">
+            <img src={profileImage || profileImg} alt={firstName} />
           </span>
-          User
+          <span className="user-name">{firstName}</span>
         </button>
 
         <ul className="dropdown-menu">

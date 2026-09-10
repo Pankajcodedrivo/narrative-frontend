@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import WelcomeHeader from "../../../components/WelcomeHeader/WelcomeHeader";
 import videoPoster from "../../../assets/images/video-poster.jpg";
-import "./MyCollections.scss";
 import AccordionItem from "../../../components/AccordionItem/AccordionItem";
 import Table from "../../../components/Table/Table";
 import {
@@ -11,32 +10,41 @@ import {
   refreshMyCollections,
   type CollectionItem,
 } from "../../../services/apis/collection.api";
+import "./MyCollections.scss";
+
+function formatCollectionDate(
+  value: string | number | Date | null | undefined,
+) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString();
+}
+
+function formatStageLabel(value?: string | null) {
+  if (!value) return "Queued";
+  return value
+    .replace(/_/g, " ")
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
 
 const MyCollections = () => {
+  const navigate = useNavigate();
   const location = useLocation();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
-  const renderState = (location.state as
-    | { renderId?: string; renderError?: string; renderPending?: boolean }
-    | null
-    | undefined) || null;
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setPlaying(false);
-    }
-  };
+  const renderState =
+    (location.state as
+      | { renderId?: string; renderError?: string; renderPending?: boolean }
+      | null
+      | undefined) || null;
 
   async function loadCollections() {
     setLoading(true);
@@ -77,23 +85,22 @@ const MyCollections = () => {
     void refreshCollections();
   }, [renderState?.renderId, renderState?.renderPending]);
 
+  const shouldPoll = useMemo(() => {
+    return (
+      Boolean(renderState?.renderPending) ||
+      items.some((item) => item.status === "processing")
+    );
+  }, [items, renderState?.renderPending]);
+
   useEffect(() => {
-    if (!renderState?.renderId) return;
+    if (!shouldPoll) return;
 
-    const el = document.getElementById(`collection-row-${renderState.renderId}`);
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [items, renderState?.renderId]);
-
-  useEffect(() => {
-    const hasProcessing = items.some((i) => i.status === "processing");
-    if (!hasProcessing) return;
-
-    const id = window.setInterval(() => {
+    const interval = window.setInterval(() => {
       void refreshCollections();
-    }, 15000);
+    }, 7000);
 
-    return () => window.clearInterval(id);
-  }, [items]);
+    return () => window.clearInterval(interval);
+  }, [shouldPoll]);
 
   const hero = useMemo(() => {
     if (renderState?.renderId) {
@@ -104,6 +111,7 @@ const MyCollections = () => {
     return items[0] || null;
   }, [items, renderState?.renderId]);
 
+  const hasLatestVideo = Boolean(hero?.videoUrl);
   const heroStatus = hero?.status || "processing";
   const heroStatusLabel =
     heroStatus === "succeeded"
@@ -111,209 +119,198 @@ const MyCollections = () => {
       : heroStatus === "failed"
         ? "Failed"
         : "In Progress";
-  const heroDate = hero?.createdAt
-    ? new Date(hero.createdAt).toLocaleString()
-    : "-";
-  const heroIsProcessing = heroStatus === "processing";
-  const highlightedTaskId = renderState?.renderId || null;
+  const heroStage = formatStageLabel(hero?.currentStage);
+  const heroPhase = formatStageLabel(hero?.currentPhase);
+  const heroMessage =
+    hero?.stageMessage ||
+    (heroStatus === "failed"
+      ? "The pipeline stopped and can be retried."
+      : "Your collection is still being assembled in the background.");
+  const heroDate = formatCollectionDate(hero?.createdAt);
 
-  function renderStatusLabel(status: CollectionItem["status"]) {
-    if (status === "succeeded") return "Completed";
-    if (status === "failed") return "Failed";
-    return "In Progress";
+  function togglePlay() {
+    if (!videoRef.current || !hero?.videoUrl) return;
+
+    if (videoRef.current.paused) {
+      void videoRef.current.play();
+      setPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setPlaying(false);
+    }
+  }
+
+  function handleRefresh() {
+    if (!hasLatestVideo) {
+      navigate("/my-interviews");
+      return;
+    }
+
+    void refreshCollections();
   }
 
   return (
     <>
       <WelcomeHeader desc="Record and manage your interview responses in one place." />
 
-      {renderState?.renderId || renderState?.renderPending ? (
-        <div className="alert alert-info mb-4 collection-handoff-banner">
-          Your interview video is in progress in the background.
-          {renderState?.renderId ? (
-            <div className="small mt-1">
-              Render ID: <strong>{renderState.renderId}</strong>
-            </div>
-          ) : null}
+      {renderState?.renderError ? (
+        <div className="alert alert-warning mb-4">
+          {renderState.renderError}
         </div>
       ) : null}
 
-      {renderState?.renderError ? (
-        <div className="alert alert-warning mb-4">{renderState.renderError}</div>
+      {renderState?.renderPending ? (
+        <div className="collection-handoff-banner alert alert-info mb-4">
+          Your interview was submitted. The collection is building in the
+          background and will update here automatically.
+        </div>
       ) : null}
 
-      <div className="collections-video mb-4">
-        <video
-          ref={videoRef}
-          muted
-          poster={videoPoster}
-          controls={!!hero?.videoUrl}
-        >
-          {hero?.videoUrl ? (
-            <source src={hero.videoUrl} type="video/mp4" />
-          ) : null}
-          Your browser does not support the video tag.
-        </video>
-
-        <button
-          className="video-play-btn"
-          onClick={togglePlay}
-          disabled={!hero?.videoUrl}
-        >
-          {playing ? "❚❚" : "▶"}
-        </button>
-      </div>
-
-      <div
-        className={`my-life-story mb-32 ${
-          heroStatus === "processing" ? "my-life-story--processing" : ""
-        }`}
-      >
-        <div className="my-life-story-hdr mb-4">
-          <div className="left-part">
-            <h3>My Life Story (Personal Interview)</h3>
-            <ul>
-              <li>
-                Status: <span>{heroStatusLabel}</span>
-              </li>
-              <li>
-                Date & Time: <span>{heroDate}</span>
-              </li>
-            </ul>
-          </div>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={refreshCollections}
-              disabled={refreshing}
-            >
-              {refreshing ? "Refreshing..." : "Refresh"}
-            </button>
-            {hero?.status === "failed" ? (
+      {!loading && !hasLatestVideo ? (
+        <div className="collections-empty mb-4">
+          <div className="collections-empty__content">
+            <p className="collections-empty__eyebrow">No video yet</p>
+            <h3>Go to Interview page and take the interview.</h3>
+            <p>
+              Start the interview to create your personal story video. After you
+              finish, the latest video will appear here automatically.
+            </p>
+            <div className="d-flex gap-2 flex-wrap">
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => hero && void regenerateCollection(hero)}
-                disabled={regeneratingId === hero._id}
+                onClick={() => navigate("/my-interviews")}
               >
-                {regeneratingId === hero._id ? "Regenerating..." : "Regenerate"}
+                Go to Interview Page
               </button>
-            ) : hero?.videoUrl ? (
-              <a
-                className="btn btn-secondary"
-                href={hero.videoUrl}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleRefresh}
               >
-                Download
-              </a>
-            ) : (
-              <button type="button" className="btn btn-secondary" disabled>
-                Download
+                Refresh
               </button>
-            )}
+            </div>
           </div>
         </div>
+      ) : null}
 
-        {hero?.error ? (
-          <div className="alert alert-warning mb-0">{hero.error}</div>
-        ) : heroIsProcessing ? (
-          <div className="alert alert-info mb-0">
-            Video is in progress in the background. You can leave this page and
-            come back later.
+      {hasLatestVideo ? (
+        <>
+          <div className="collections-video mb-4">
+            <video
+              ref={videoRef}
+              muted
+              poster={videoPoster}
+              controls={Boolean(hero?.videoUrl)}
+            >
+              {hero?.videoUrl ? (
+                <source src={hero.videoUrl} type="video/mp4" />
+              ) : null}
+              Your browser does not support the video tag.
+            </video>
+
+            <button
+              className="video-play-btn"
+              onClick={togglePlay}
+              disabled={!hero?.videoUrl}
+              type="button"
+            >
+              {playing ? "Pause" : "Play"}
+            </button>
           </div>
-        ) : null}
 
-        {hero?.status === "failed" ? (
-          <div className="alert alert-danger mb-0 mt-2">
-            Video generation failed. Use regenerate to queue it again.
-          </div>
-        ) : null}
-      </div>
-
-      <div className="my-life-story mb-32">
-        <div className="my-life-story-hdr mb-4">
-          <div className="left-part">
-            <h3>Generated Videos</h3>
-            <ul>
-              <li>
-                Total: <span>{items.length}</span>
-              </li>
-              <li>
-                Latest: <span>{heroStatusLabel}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Video</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={4}>Loading...</td>
-                </tr>
-              ) : items.length === 0 ? (
-                <tr>
-                  <td colSpan={4}>No generated videos yet.</td>
-                </tr>
-              ) : (
-                items.map((item) => (
-                  <tr
-                    key={item._id}
-                    id={`collection-row-${item.taskId}`}
-                    className={item.taskId === highlightedTaskId ? "is-highlighted" : ""}
+          <div
+            className={`my-life-story mb-32 ${
+              heroStatus === "processing"
+                ? "my-life-story--processing"
+                : heroStatus === "failed"
+                  ? "my-life-story--failed"
+                  : "my-life-story--complete"
+            }`}
+          >
+            <div className="my-life-story-hdr mb-4">
+              <div className="left-part">
+                <h3>My Life Story (Personal Interview)</h3>
+                <ul>
+                  <li>
+                    Status: <span>{heroStatusLabel}</span>
+                  </li>
+                  <li>
+                    Date & Time: <span>{heroDate}</span>
+                  </li>
+                  <li>
+                    Stage: <span>{heroStage}</span>
+                  </li>
+                  <li>
+                    Phase: <span>{heroPhase}</span>
+                  </li>
+                </ul>
+              </div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                >
+                  {refreshing ? "Refreshing..." : "Refresh"}
+                </button>
+                {hero?.status === "failed" ? (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => hero && void regenerateCollection(hero)}
+                    disabled={regeneratingId === hero._id}
                   >
-                    <td>{item.category}</td>
-                    <td>{renderStatusLabel(item.status)}</td>
-                    <td>{new Date(item.createdAt).toLocaleString()}</td>
-                    <td>
-                      {item.status === "failed" ? (
-                        <button
-                          type="button"
-                          className="resend-btn btn btn-outline"
-                          onClick={() => void regenerateCollection(item)}
-                          disabled={regeneratingId === item._id}
-                        >
-                          {regeneratingId === item._id
-                            ? "Regenerating..."
-                            : "Regenerate"}
-                        </button>
-                      ) : item.videoUrl ? (
-                        <a
-                          className="resend-btn btn btn-outline"
-                          href={item.videoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Watch
-                        </a>
-                      ) : (
-                        <button
-                          type="button"
-                          className="resend-btn btn btn-outline"
-                          disabled
-                        >
-                          In Progress...
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                    {regeneratingId === hero._id ? "Retrying..." : "Retry"}
+                  </button>
+                ) : hero?.videoUrl ? (
+                  <a
+                    className="btn btn-secondary"
+                    href={hero.videoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Download
+                  </a>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="collection-progress-panel mb-3">
+              <div className="collection-progress-panel__label">
+                Current status
+              </div>
+              <div className="collection-progress-panel__value">
+                {heroStatusLabel}
+              </div>
+              <p className="collection-progress-panel__message">
+                {heroMessage}
+              </p>
+              {hero?.failedStage ? (
+                <div className="collection-progress-panel__failed">
+                  Failed stage:{" "}
+                  <span>{formatStageLabel(hero.failedStage)}</span>
+                </div>
+              ) : null}
+              {typeof hero?.retryCount === "number" ? (
+                <div className="collection-progress-panel__retry">
+                  Retry count: <span>{hero.retryCount}</span>
+                </div>
+              ) : null}
+            </div>
+
+            {hero?.error ? (
+              <div className="alert alert-warning mb-0">{hero.error}</div>
+            ) : hero?.status === "failed" ? (
+              <div className="alert alert-danger mb-0 mt-2">
+                Video generation failed. Use retry to queue it again.
+              </div>
+            ) : null}
+          </div>
+        </>
+      ) : null}
 
       <div className="accordion p-32">
         <AccordionItem

@@ -1,11 +1,13 @@
 // hooks/useProfile.ts
 import { useFormik } from 'formik';
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { profileSchema } from '../../../utils/yupSchemas';
 import type { ProfileFormData } from '../../../utils/yupSchemas';
 import { getProfile, updateProfile } from '../../../services/apis/user.api';
 import { updateUserProfile } from '../../../store/auth.store';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 // Types - UPDATED: Changed from 'type' to 'gender'
 export type Sibling = {
@@ -143,6 +145,7 @@ interface UseProfileReturn {
   handleSiblingDetailChange: (index: number, field: keyof Sibling, value: string) => void;
   handleSameAsEarlyChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleSameAsEarlyAdulthoodChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleShareStoryChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleMomentSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleImageChange: (field: string, file: File | null) => void;
   handleRemoveImage: (field: string) => void;
@@ -176,7 +179,7 @@ interface UseProfileReturn {
   musicGenres: string[];
 }
 
-export const useProfile = (): UseProfileReturn => {
+export const useProfile = (redirectTo?: string | null): UseProfileReturn => {
   const [storyLocked, setStoryLocked] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -184,6 +187,7 @@ export const useProfile = (): UseProfileReturn => {
   const [referenceImages, setReferenceImages] = useState<ReferenceImages>({});
   const [musicGenres, setMusicGenres] = useState<string[]>([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const formik = useFormik<ProfileFormData>({
     initialValues,
     validationSchema: profileSchema,
@@ -241,8 +245,11 @@ export const useProfile = (): UseProfileReturn => {
           earlyAdulthood: values.earlyAdulthood,
           lateAdulthood: values.lateAdulthood,
           shareStory: values.shareStory,
-          storyHighlight: values.storyHighlight,
         };
+
+        if (values.shareStory === 'Yes') {
+          dataToSend.storyHighlight = values.storyHighlight;
+        }
 
         // Append JSON data
         Object.entries(dataToSend).forEach(([key, value]) => {
@@ -258,9 +265,13 @@ export const useProfile = (): UseProfileReturn => {
         const response = await updateProfile(formData);
         
         if (response.success) {
+          toast.success(response.message || 'Profile updated successfully');
           if (response.data?.user) {
             dispatch(updateUserProfile(response.data?.user));
             await loadUserProfile();
+            if (redirectTo) {
+              navigate(redirectTo, { replace: true });
+            }
           }
         }
       } catch (error: any) {
@@ -358,18 +369,28 @@ export const useProfile = (): UseProfileReturn => {
             maritalStatus: userData.lateAdulthood?.maritalStatus || '',
           },
           shareStory: userData.shareStory || '',
-          storyHighlight: {
-            momentType: userData.storyHighlight?.momentType || '',
-            momentOther: userData.storyHighlight?.momentOther || '',
-            impactType: userData.storyHighlight?.impactType || '',
-            impactOther: userData.storyHighlight?.impactOther || '',
-          },
+          storyHighlight:
+            userData.shareStory === 'Yes'
+              ? {
+                  momentType: userData.storyHighlight?.momentType || '',
+                  momentOther: userData.storyHighlight?.momentOther || '',
+                  impactType: userData.storyHighlight?.impactType || '',
+                  impactOther: userData.storyHighlight?.impactOther || '',
+                }
+              : {
+                  momentType: '',
+                  momentOther: '',
+                  impactType: '',
+                  impactOther: '',
+                },
           profileimageurl: userData.profileimageurl || null,
         };
 
-        // Set story locked if moment type exists
-        if (userData.storyHighlight?.momentType) {
+        // Set story locked only when the story section is active
+        if (userData.shareStory === 'Yes' && userData.storyHighlight?.momentType) {
           setStoryLocked(true);
+        } else {
+          setStoryLocked(false);
         }
 
         formik.setValues(formValues as ProfileFormData);
@@ -385,7 +406,7 @@ export const useProfile = (): UseProfileReturn => {
     loadUserProfile();
   }, []);
 
-  const validateSection = async (sectionIndex: number, fields: string[]): Promise<boolean> => {
+  const validateSection = async (_sectionIndex: number, fields: string[]): Promise<boolean> => {
     const touchedFields: any = {};
     fields.forEach(field => {
       if (field.includes('.')) {
@@ -492,6 +513,21 @@ export const useProfile = (): UseProfileReturn => {
     }
   };
 
+  const handleShareStoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    formik.setFieldValue('shareStory', value);
+
+    if (value !== 'Yes') {
+      formik.setFieldValue('storyHighlight', {
+        momentType: '',
+        momentOther: '',
+        impactType: '',
+        impactOther: '',
+      });
+      setStoryLocked(false);
+    }
+  };
+
   const handleMomentSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     
@@ -577,6 +613,7 @@ export const useProfile = (): UseProfileReturn => {
     handleSiblingDetailChange,
     handleSameAsEarlyChange,
     handleSameAsEarlyAdulthoodChange,
+    handleShareStoryChange,
     handleMomentSelect,
     handleImageChange,
     handleRemoveImage,

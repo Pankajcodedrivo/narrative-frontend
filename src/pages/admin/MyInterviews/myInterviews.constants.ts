@@ -1,13 +1,17 @@
 import type { InterviewCategory } from "../../../services/apis/interview.api";
 
 export const CATEGORY_ORDER: InterviewCategory[] = [
+  "opening",
   "childhood",
   "adulthood",
   "storyhighlight",
-  "bookends",
+  "closing",
 ];
 
-export function mapKey(category: InterviewCategory, setType: "flow" | "database") {
+export function mapKey(
+  category: InterviewCategory,
+  setType: "flow" | "database",
+) {
   return `${category}:${setType}`;
 }
 
